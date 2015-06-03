@@ -20,8 +20,9 @@ private:
     QPalette paletteDisabled;
 
 public:
-    ChannelPanel(int channel, QString name, QColor = Qt::darkGray);
+    ChannelPanel(int channel, QString name, QColor = Qt::black);
 
+    void setChannelColor(QColor color);
     bool isChannelVisible();
     void setNullVoltage();
 

@@ -7,37 +7,17 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTick()));
 
     connectionPanel = new ConnectionPanel(serverHost, serverPort);
-
-    channelPanel[0] = nullptr;
-    channelPanel[1] = new ChannelPanel(1, "Kanał 1", plot->getChannelColor(1));
-    channelPanel[2] = new ChannelPanel(2, "Kanał 2", plot->getChannelColor(2));
-    channelPanel[3] = new ChannelPanel(3, "Kanał 3", plot->getChannelColor(3));
-    channelPanel[4] = new ChannelPanel(4, "Kanał 4", plot->getChannelColor(4));
-
-    timeRangeEdit = new QTimeEdit();
-    timeRangeEdit->setDisplayFormat("HH:mm:ss.zzz");
-    timeRangeEdit->setCurrentSectionIndex(2);
-    timeRangeEdit->setMinimumTime(QTime(0, 0, 0, 1));
-    timeRangeEdit->setTime(QTime(0, 0, 8, 0));
-    timeRangeEdit->setFixedWidth(120);
-    connect(timeRangeEdit, SIGNAL(timeChanged(QTime)),
-            this, SLOT(timeRangeChanged(QTime)));
+    sidePanel = new SidePanel();
 
     plot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     plot->setMinimumSize(300, 150);
     connectionPanel->layout()->setContentsMargins(0, 0, 0, 0);
-
-    QVBoxLayout *panelLayout = new QVBoxLayout();
-    panelLayout->setAlignment(Qt::AlignTop);
-    panelLayout->addWidget(channelPanel[1]);
-    panelLayout->addWidget(channelPanel[2]);
-    panelLayout->addWidget(channelPanel[3]);
-    panelLayout->addWidget(channelPanel[4]);
-    panelLayout->addWidget(timeRangeEdit);
+    sidePanel->layout()->setContentsMargins(0, 0, 0, 0);
+    sidePanel->setFixedWidth(120);
 
     QHBoxLayout *contentLayout = new QHBoxLayout();
     contentLayout->addWidget(plot);
-    contentLayout->addLayout(panelLayout);
+    contentLayout->addWidget(sidePanel);
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(connectionPanel);
@@ -47,7 +27,14 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     centerWidget->setLayout(layout);
     setCentralWidget(centerWidget);
 
+    channelPanel[0] = nullptr;
     for (int i = 1; i <= 4; i++) {
+        channelPanel[i] = sidePanel->getChannelPanel(i);
+
+        QColor color = plot->getChannelColor(i);
+        channelPanel[i]->setChannelColor(color);
+        channelPanel[i]->layout()->setContentsMargins(0, 0, 0, 0);
+
         connect(channelPanel[i], SIGNAL(channelVisibleChanged(int, bool)),
                 plot, SLOT(setChannelVisible(int, bool)));
     }
@@ -55,6 +42,11 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     channelPanel[2]->setChannelVisible(false);
     channelPanel[3]->setChannelVisible(false);
     channelPanel[4]->setChannelVisible(false);
+
+    connect(sidePanel->getTimeRangeEdit(), SIGNAL(timeChanged(QTime)),
+            this, SLOT(timeRangeChanged(QTime)));
+    connect(sidePanel->getTimeIntervalEdit(), SIGNAL(timeChanged(QTime)),
+            this, SLOT(timeIntervalChanged(QTime)));
 
     connect(connectionPanel, SIGNAL(doConnect(QString&, quint16&)),
             this, SLOT(doConnect(QString&, quint16&)));
@@ -87,7 +79,12 @@ void MainWindow::socketStateChanged(QAbstractSocket::SocketState state) {
 
     if (state == QAbstractSocket::ConnectedState) {
         std::cout << "Połączono, pobieranie danych..." << std::endl;
-        timer->start(10);
+
+        int timeRange = sidePanel->getTimeRangeMillis();
+        plot->setTimeRange(timeRange / 1000);
+
+        int interval = sidePanel->getTimeIntervalMillis();
+        timer->start(interval);
     } else if (state == QAbstractSocket::UnconnectedState) {
         std::cout << "Rozłączono: " << clientSocket->errorString().toStdString() << std::endl;
         timer->stop();
@@ -116,6 +113,12 @@ void MainWindow::setNullVoltage() {
 }
 
 void MainWindow::timeRangeChanged(QTime time) {
-    double millis = time.msecsSinceStartOfDay();
-    plot->setTimeRange(millis / 1000);
+    int millis = time.msecsSinceStartOfDay();
+    plot->setTimeRange((double) millis / 1000);
+}
+
+
+void MainWindow::timeIntervalChanged(QTime time) {
+    int millis = time.msecsSinceStartOfDay();
+    timer->setInterval(millis);
 }

@@ -86,7 +86,7 @@ void GaugePlot::appendMeasurement(Measurement &data) {
 
 void GaugePlot::updateGraphChannel(int channel, double time, double voltage) {
     graph[channel]->addData(time, voltage);
-    graph[channel]->removeDataBefore(time - timeRange);
+    graph[channel]->removeDataBefore(time - (timeRange * 2));
 
     dot[channel]->clearData();
     dot[channel]->addData(time, voltage);

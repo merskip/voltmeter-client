@@ -28,8 +28,7 @@ ChannelPanel::ChannelPanel(int channel, QString name, QColor color)
     layout->addLayout(topLayout);
     layout->addWidget(voltageLabel);
 
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setFixedWidth(120);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     setLayout(layout);
 
     paletteEnabled.setColor(foregroundRole(), color);
@@ -38,6 +37,11 @@ ChannelPanel::ChannelPanel(int channel, QString name, QColor color)
 
     connect(toggleBtn, SIGNAL(toggled(bool)),
             this, SLOT(setChannelVisible(bool)));
+}
+
+
+void ChannelPanel::setChannelColor(QColor color) {
+    paletteEnabled.setColor(foregroundRole(), color);
 }
 
 void ChannelPanel::setVoltage(double value) {

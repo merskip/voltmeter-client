@@ -5,7 +5,8 @@
 #include "GaugePlot.hpp"
 #include "ClientSocket.hpp"
 #include "ConnectionPanel.hpp"
-#include "ChannelPanel.hpp"
+#include "SidePanel.hpp"
+
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -17,7 +18,7 @@ private:
 
     ConnectionPanel *connectionPanel;
     ChannelPanel *channelPanel[5];
-    QTimeEdit *timeRangeEdit;
+    SidePanel *sidePanel;
 
 public:
     MainWindow(QString serverHost, quint16 serverPort);
@@ -31,7 +32,9 @@ private slots:
     void socketStateChanged(QAbstractSocket::SocketState state);
 
     void timerTick();
+
     void timeRangeChanged(QTime time);
+    void timeIntervalChanged(QTime time);
 
     void voltageChanged(Measurement &data);
 };
