@@ -117,6 +117,5 @@ void MainWindow::setNullVoltage() {
 
 void MainWindow::timeRangeChanged(QTime time) {
     double millis = time.msecsSinceStartOfDay();
-    timer->setInterval((int) millis);
     plot->setTimeRange(millis / 1000);
 }

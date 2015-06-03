@@ -48,7 +48,7 @@ void GaugePlot::setupGraphChannel(int channel, QColor color) {
 
 void GaugePlot::setVoltageRange(double min, double max) {
     yAxis->setRange(min, max);
-    this->replot();
+    replot();
 }
 
 void GaugePlot::setTimeRange(double time) {
@@ -69,8 +69,8 @@ void GaugePlot::clearAllChannel() {
         graph[i]->clearData();
         dot[i]->clearData();
     }
-    this->xAxis->setRange(0, 0);
-    this->replot();
+    xAxis->setRange(0, 0);
+    replot();
 }
 
 void GaugePlot::appendMeasurement(Measurement &data) {
@@ -80,8 +80,8 @@ void GaugePlot::appendMeasurement(Measurement &data) {
     updateGraphChannel(3, data.time, data.channel[3].voltage);
     updateGraphChannel(4, data.time, data.channel[4].voltage);
 
-    this->xAxis->setRange(data.time, timeRange, Qt::AlignRight);
-    this->replot();
+    xAxis->setRange(data.time, timeRange, Qt::AlignRight);
+    replot();
 }
 
 void GaugePlot::updateGraphChannel(int channel, double time, double voltage) {
