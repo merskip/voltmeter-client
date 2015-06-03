@@ -27,6 +27,8 @@ public:
 
     QColor getChannelColor(int channel);
 
+    void clearAllChannel();
+
 public slots:
     void setChannelVisible(int channel, bool on);
     void appendMeasurement(Measurement &data);

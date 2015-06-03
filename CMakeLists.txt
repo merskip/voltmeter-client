@@ -17,6 +17,7 @@ set(SOURCE_FILES
     GaugePlot.cpp
     ClientSocket.cpp
     ChannelPanel.cpp
+    ConnectionPanel.cpp
     MainWindow.cpp)
 add_executable(voltmeter ${SOURCE_FILES})
 

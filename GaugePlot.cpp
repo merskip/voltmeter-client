@@ -48,7 +48,7 @@ void GaugePlot::setupGraphChannel(int channel, QColor color) {
 
 void GaugePlot::setVoltageRange(double min, double max) {
     yAxis->setRange(min, max);
-    yAxis2->setRange(min, max);
+    this->replot();
 }
 
 void GaugePlot::setTimeRange(double time) {
@@ -62,6 +62,15 @@ void GaugePlot::setChannelVisible(int channel, bool on) {
 
 QColor GaugePlot::getChannelColor(int channel) {
     return graph[channel]->pen().color();
+}
+
+void GaugePlot::clearAllChannel() {
+    for (int i = 1; i <= 4; i++) {
+        graph[i]->clearData();
+        dot[i]->clearData();
+    }
+    this->xAxis->setRange(0, 0);
+    this->replot();
 }
 
 void GaugePlot::appendMeasurement(Measurement &data) {

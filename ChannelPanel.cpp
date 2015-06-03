@@ -57,12 +57,15 @@ void ChannelPanel::setChannelVisible(bool visible) {
     } else {
         toggleBtn->setText("Off");
         toggleBtn->setChecked(visible);
-        voltageLabel->setText("-.-- V");
+        setNullVoltage();
         setPalette(paletteDisabled);
     }
     emit channelVisibleChanged(channel, visible);
 }
 
+void ChannelPanel::setNullVoltage() {
+    voltageLabel->setText("-.-- V");
+}
 
 bool ChannelPanel::isChannelVisible() {
     return channelVisible;

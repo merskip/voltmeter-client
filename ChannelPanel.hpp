@@ -23,6 +23,7 @@ public:
     ChannelPanel(int channel, QString name, QColor = Qt::darkGray);
 
     bool isChannelVisible();
+    void setNullVoltage();
 
 public slots:
     void setVoltage(double value);
