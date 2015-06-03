@@ -13,7 +13,6 @@ ConnectionPanel::ConnectionPanel(QString host, quint16 port) {
     portEdit->setValue(port);
 
     connectBtn = new QPushButton();
-    stateLabel = new QLabel();
 
     QLabel *hostLabel = new QLabel("Host:");
     QLabel *portLabel = new QLabel("Port:");
@@ -26,7 +25,6 @@ ConnectionPanel::ConnectionPanel(QString host, quint16 port) {
     layout->addWidget(portEdit);
     layout->addSpacerItem(new QSpacerItem(20, 0));
     layout->addWidget(connectBtn);
-    layout->addWidget(stateLabel);
     layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
     setLayout(layout);
 
@@ -63,17 +61,14 @@ void ConnectionPanel::setConnectState(QAbstractSocket::SocketState state) {
 void ConnectionPanel::setConnectState(ConnectionState state) {
     switch (state) {
         case Connected:
-            stateLabel->setText("Połączono");
             connectBtn->setText("Rozłącz");
             connectBtn->setEnabled(true);
             break;
         case Disconnected:
-            stateLabel->setText("Rozłączono");
             connectBtn->setText("Połącz");
             connectBtn->setEnabled(true);
             break;
         case Connecting:
-            stateLabel->setText("Łączenie...");
             connectBtn->setText("Połącz");
             connectBtn->setEnabled(false);
             break;

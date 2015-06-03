@@ -24,7 +24,8 @@ private:
 public:
     MainWindow(QString serverHost, quint16 serverPort);
 
-    QString getServerConnectedAddress();
+    static QString toPrettyPeerAddress(QAbstractSocket *socket);
+    static QString toPrettyAddress(QString host, quint16 port);
 
 private:
     void setNullVoltage();

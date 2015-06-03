@@ -22,7 +22,6 @@ private:
 
     ConnectionState connectionState;
     QPushButton *connectBtn;
-    QLabel *stateLabel;
 
 public:
     ConnectionPanel(QString host, quint16 port);

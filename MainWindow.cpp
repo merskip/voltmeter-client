@@ -68,6 +68,7 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
 }
 
 void MainWindow::doConnect(QString &host, quint16 &port) {
+    statusBar()->showMessage("Łączenie z " + toPrettyAddress(host, port) + "...");
     isSocketError = false;
     clientSocket->connectToHost(host, port);
 }
@@ -81,7 +82,7 @@ void MainWindow::socketStateChanged(QAbstractSocket::SocketState state) {
     connectionPanel->setConnectState(state);
 
     if (state == QAbstractSocket::ConnectedState) {
-        QString serverAddress = getServerConnectedAddress();
+        QString serverAddress = toPrettyPeerAddress(clientSocket);
         statusBar()->showMessage("Połączono z " + serverAddress);
 
         int timeRange = sidePanel->getTimeRangeMillis();
@@ -105,11 +106,18 @@ void MainWindow::socketError(QAbstractSocket::SocketError error) {
     isSocketError = true;
 }
 
-QString MainWindow::getServerConnectedAddress() {
+
+QString MainWindow::toPrettyPeerAddress(QAbstractSocket *socket) {
+    QString host = socket->peerAddress().toString();
+    quint16 port = socket->peerPort();
+    return toPrettyAddress(host, port);
+}
+
+QString MainWindow::toPrettyAddress(QString host, quint16 port) {
     QString address;
-    address.append(clientSocket->peerAddress().toString());
+    address.append(host);
     address.append(":");
-    address.append(QString::number(clientSocket->peerPort()));
+    address.append(QString::number(port));
     return address;
 }
 
@@ -124,7 +132,6 @@ void MainWindow::voltageChanged(Measurement &data) {
     channelPanel[4]->setVoltage(data.channel[4].voltage);
 }
 
-
 void MainWindow::setNullVoltage() {
     channelPanel[1]->setNullVoltage();
     channelPanel[2]->setNullVoltage();
@@ -136,7 +143,6 @@ void MainWindow::timeRangeChanged(QTime time) {
     int millis = time.msecsSinceStartOfDay();
     plot->setTimeRange((double) millis / 1000);
 }
-
 
 void MainWindow::timeIntervalChanged(QTime time) {
     int millis = time.msecsSinceStartOfDay();
