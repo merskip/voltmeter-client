@@ -53,6 +53,11 @@ void GaugePlot::setVoltageRange(double min, double max) {
 
 void GaugePlot::setTimeRange(double time) {
     timeRange = time;
+    xAxis->setTickStep(time / 4.0);
+    if (time >= 1.0)
+        xAxis->setDateTimeFormat("hh:mm:ss");
+    else
+        xAxis->setDateTimeFormat("zzz");
 }
 
 void GaugePlot::setChannelVisible(int channel, bool on) {
