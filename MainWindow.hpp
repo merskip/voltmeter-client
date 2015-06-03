@@ -12,6 +12,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
+    bool isSocketError = false;
     ClientSocket *clientSocket;
     GaugePlot *plot;
     QTimer *timer;
@@ -23,13 +24,19 @@ private:
 public:
     MainWindow(QString serverHost, quint16 serverPort);
 
+    QString getServerConnectedAddress();
+
 private:
     void setNullVoltage();
+
+    static QString socketErrorToString(QAbstractSocket::SocketError error);
 
 private slots:
     void doConnect(QString &host, quint16 &port);
     void doDisconnect();
+
     void socketStateChanged(QAbstractSocket::SocketState state);
+    void socketError(QAbstractSocket::SocketError error);
 
     void timerTick();
 
