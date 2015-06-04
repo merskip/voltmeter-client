@@ -14,6 +14,9 @@ ConnectionPanel::ConnectionPanel(QString host, quint16 port) {
 
     connectBtn = new QPushButton();
 
+    frameModeCheck = new QCheckBox("Tryb frame:");
+    frameModeCheck->setLayoutDirection(Qt::RightToLeft);
+
     QLabel *hostLabel = new QLabel("Host:");
     QLabel *portLabel = new QLabel("Port:");
 
@@ -26,12 +29,16 @@ ConnectionPanel::ConnectionPanel(QString host, quint16 port) {
     layout->addSpacerItem(new QSpacerItem(20, 0));
     layout->addWidget(connectBtn);
     layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
+    layout->addWidget(frameModeCheck);
     setLayout(layout);
 
     setConnectState(ConnectionState::Disconnected);
 
     connect(connectBtn, SIGNAL(clicked()),
             this, SLOT(handleConnectBtn()));
+
+    connect(frameModeCheck, SIGNAL(stateChanged(int)),
+            this, SLOT(handleFrameModeStateChanged(int)));
 }
 
 void ConnectionPanel::handleConnectBtn() {
@@ -75,3 +82,12 @@ void ConnectionPanel::setConnectState(ConnectionState state) {
     }
     connectionState = state;
 }
+
+bool ConnectionPanel::isFrameMode() {
+    return frameModeCheck->isChecked();
+}
+
+void ConnectionPanel::handleFrameModeStateChanged(int state) {
+    emit frameModeChanged((bool) state);
+}
+

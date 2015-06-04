@@ -12,6 +12,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
+    bool isFrameMode = false;
     bool isSocketError = false;
     ClientSocket *clientSocket;
     GaugePlot *plot;
@@ -20,6 +21,9 @@ private:
     ConnectionPanel *connectionPanel;
     ChannelPanel *channelPanel[5];
     SidePanel *sidePanel;
+
+    int timeRange;
+    int timeInterval;
 
 public:
     MainWindow(QString serverHost, quint16 serverPort);
@@ -43,6 +47,8 @@ private slots:
 
     void timeRangeChanged(QTime time);
     void timeIntervalChanged(QTime time);
+
+    void frameModeChanged(bool isFrameMode);
 
     void voltageChanged(Measurement &data);
 };

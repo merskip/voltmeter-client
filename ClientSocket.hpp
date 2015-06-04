@@ -12,8 +12,11 @@ public:
 
     Measurement downloadMeasurement();
 
+    QList<QVector<double>> downloadFrame(int duration);
+
 signals:
     void measurementDownloaded(Measurement &data);
+    void frameDownloaded(int duration, QList<QVector<double>> &data);
 
 private:
     double toVoltage(int value);

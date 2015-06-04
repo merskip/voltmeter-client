@@ -13,6 +13,7 @@ private:
     QCPGraph *graph[5];
     QCPGraph *dot[5];
 
+    bool isFrameMode;
     double timeRange;
 
 public:
@@ -25,6 +26,8 @@ public:
         return timeRange;
     }
 
+    void setFrameMode(bool state);
+
     QColor getChannelColor(int channel);
 
     void clearAllChannel();
@@ -32,6 +35,8 @@ public:
 public slots:
     void setChannelVisible(int channel, bool on);
     void appendMeasurement(Measurement &data);
+
+    void showFrame(int duration, QList<QVector<double>> &data);
 
 private:
     void setupGraphChannel(int channel, QColor color);

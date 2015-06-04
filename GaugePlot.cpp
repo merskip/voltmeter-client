@@ -69,6 +69,15 @@ QColor GaugePlot::getChannelColor(int channel) {
     return graph[channel]->pen().color();
 }
 
+
+void GaugePlot::setFrameMode(bool state) {
+    if (state) {
+        clearAllChannel();
+    } else {
+        setTimeRange(timeRange);
+    }
+}
+
 void GaugePlot::clearAllChannel() {
     for (int i = 1; i <= 4; i++) {
         graph[i]->clearData();
@@ -95,4 +104,23 @@ void GaugePlot::updateGraphChannel(int channel, double time, double voltage) {
 
     dot[channel]->clearData();
     dot[channel]->addData(time, voltage);
+}
+
+void GaugePlot::showFrame(int duration, QList<QVector<double>> &data) {
+    graph[1]->clearData();
+    graph[2]->clearData();
+    graph[3]->clearData();
+    graph[4]->clearData();
+
+    int dataSize = data.size();
+    for (int i = 0; i < dataSize; i++) {
+        const QVector<double> &item = data.at(i);
+        graph[1]->addData(i, item.at(1));
+        graph[2]->addData(i, item.at(2));
+        graph[3]->addData(i, item.at(3));
+        graph[4]->addData(i, item.at(4));
+    }
+    xAxis->setRange(0, dataSize);
+    xAxis->setTickStep(0);
+    replot();
 }

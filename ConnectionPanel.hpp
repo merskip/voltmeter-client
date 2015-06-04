@@ -4,6 +4,7 @@
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QPushButton>
+#include <QCheckBox>
 #include <QAbstractSocket>
 
 class ConnectionPanel : public QWidget {
@@ -23,11 +24,16 @@ private:
     ConnectionState connectionState;
     QPushButton *connectBtn;
 
+    QCheckBox *frameModeCheck;
+
 public:
     ConnectionPanel(QString host, quint16 port);
 
+    bool isFrameMode();
+
 private slots:
     void handleConnectBtn();
+    void handleFrameModeStateChanged(int state);
 
 public slots:
     void setConnectState(QAbstractSocket::SocketState state);
@@ -36,4 +42,6 @@ public slots:
 signals:
     void doConnect(QString &host, quint16 &port);
     void doDisconnect();
+
+    void frameModeChanged(bool isFrameMode);
 };

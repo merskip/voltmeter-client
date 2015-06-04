@@ -53,6 +53,9 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     connect(connectionPanel, SIGNAL(doDisconnect()),
             this, SLOT(doDisconnect()));
 
+    connect(connectionPanel, SIGNAL(frameModeChanged(bool)),
+            this, SLOT(frameModeChanged(bool)));
+
     connect(clientSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
             this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
     connect(clientSocket, SIGNAL(error(QAbstractSocket::SocketError)),
@@ -62,6 +65,12 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
             plot, SLOT(appendMeasurement(Measurement&)));
     connect(clientSocket, SIGNAL(measurementDownloaded(Measurement&)),
             this, SLOT(voltageChanged(Measurement&)));
+
+    connect(clientSocket, SIGNAL(frameDownloaded(int, QList<QVector<double>>&)),
+            plot, SLOT(showFrame(int, QList<QVector<double>>&)));
+
+    timeRange = sidePanel->getTimeRangeMillis();
+    timeInterval = sidePanel->getTimeIntervalMillis();
 
     setNullVoltage();
     statusBar()->show();
@@ -85,11 +94,8 @@ void MainWindow::socketStateChanged(QAbstractSocket::SocketState state) {
         QString serverAddress = toPrettyPeerAddress(clientSocket);
         statusBar()->showMessage("Połączono z " + serverAddress);
 
-        int timeRange = sidePanel->getTimeRangeMillis();
         plot->setTimeRange(timeRange / 1000);
-
-        int interval = sidePanel->getTimeIntervalMillis();
-        timer->start(interval);
+        timer->start(timeInterval);
     } else if (state == QAbstractSocket::UnconnectedState) {
         timer->stop();
         plot->clearAllChannel();
@@ -122,7 +128,10 @@ QString MainWindow::toPrettyAddress(QString host, quint16 port) {
 }
 
 void MainWindow::timerTick() {
-    clientSocket->downloadMeasurement();
+    if (isFrameMode)
+        clientSocket->downloadFrame(timeInterval);
+    else
+        clientSocket->downloadMeasurement();
 }
 
 void MainWindow::voltageChanged(Measurement &data) {
@@ -142,11 +151,18 @@ void MainWindow::setNullVoltage() {
 void MainWindow::timeRangeChanged(QTime time) {
     int millis = time.msecsSinceStartOfDay();
     plot->setTimeRange((double) millis / 1000);
+    timeRange = millis;
 }
 
 void MainWindow::timeIntervalChanged(QTime time) {
     int millis = time.msecsSinceStartOfDay();
     timer->setInterval(millis);
+    timeInterval = millis;
+}
+
+void MainWindow::frameModeChanged(bool isFrameMode) {
+    this->isFrameMode = isFrameMode;
+    plot->setFrameMode(isFrameMode);
 }
 
 QString MainWindow::socketErrorToString(QAbstractSocket::SocketError error) {
