@@ -29,7 +29,6 @@ GaugePlot::GaugePlot() : QCustomPlot() {
     xAxis->setTickLabelType(QCPAxis::ltDateTime);
     xAxis->setDateTimeFormat("hh:mm:ss");
     xAxis->setAutoTickStep(false);
-    xAxis->setTickStep(2);
     axisRect()->setupFullAxesBox();
 
     setVoltageRange(-0.2, 5.3);
@@ -73,8 +72,12 @@ QColor GaugePlot::getChannelColor(int channel) {
 void GaugePlot::setFrameMode(bool state) {
     if (state) {
         clearAllChannel();
+        xAxis->setTickLabelType(QCPAxis::LabelType::ltNumber);
+        xAxis->setAutoTicks(false);
     } else {
         setTimeRange(timeRange);
+        xAxis->setTickLabelType(QCPAxis::LabelType::ltDateTime);
+        xAxis->setAutoTicks(true);
     }
 }
 
@@ -120,7 +123,13 @@ void GaugePlot::showFrame(int duration, QList<QVector<double>> &data) {
         graph[3]->addData(i, item.at(3));
         graph[4]->addData(i, item.at(4));
     }
-    xAxis->setRange(0, dataSize);
+    xAxis->setRange(0, dataSize - 1);
     xAxis->setTickStep(0);
+
+    QVector<double> tickKeys;
+    tickKeys.append(0);
+    tickKeys.append(dataSize - 1);
+    xAxis->setTickVector(tickKeys);
+
     replot();
 }
