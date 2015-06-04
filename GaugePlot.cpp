@@ -33,6 +33,7 @@ GaugePlot::GaugePlot() : QCustomPlot() {
 
     setVoltageRange(-0.2, 5.3);
     setTimeRange(8.0);
+    setTriggerVoltage(2.7);
 }
 
 
@@ -73,7 +74,7 @@ void GaugePlot::setFrameMode(bool state) {
     if (state) {
         clearAllChannel();
         xAxis->setTickLabelType(QCPAxis::LabelType::ltNumber);
-        xAxis->setAutoTicks(false);
+        xAxis->setTickStep(0);
     } else {
         setTimeRange(timeRange);
         xAxis->setTickLabelType(QCPAxis::LabelType::ltDateTime);
@@ -88,6 +89,10 @@ void GaugePlot::clearAllChannel() {
     }
     xAxis->setRange(0, 0);
     replot();
+}
+
+void GaugePlot::setTriggerVoltage(double voltage) {
+    triggerVoltage = voltage;
 }
 
 void GaugePlot::appendMeasurement(Measurement &data) {
@@ -123,13 +128,46 @@ void GaugePlot::showFrame(int duration, QList<QVector<double>> &data) {
         graph[3]->addData(i, item.at(3));
         graph[4]->addData(i, item.at(4));
     }
-    xAxis->setRange(0, dataSize - 1);
-    xAxis->setTickStep(0);
 
-    QVector<double> tickKeys;
-    tickKeys.append(0);
-    tickKeys.append(dataSize - 1);
-    xAxis->setTickVector(tickKeys);
+    int shift = getShiftForTrigger(1, triggerVoltage, data);
+    xAxis->setRange(0 + shift + (dataSize / 5), dataSize - 1 + shift - (dataSize / 5));
 
     replot();
+}
+
+
+int GaugePlot::getShiftForTrigger(int channel, double voltage, QList<QVector<double>> &data) {
+
+    int dataSize = data.size();
+    int sizeHalf = dataSize / 2;
+    for (int i = 0; i < sizeHalf; i++) {
+        int indexLeft = sizeHalf - i;
+        int indexLeftNext = indexLeft - 1;
+
+        int indexRight = sizeHalf + i;
+        int indexRightNext = indexRight + 1;
+
+        if (indexLeftNext >= 0) {
+            double leftValue = data.at(indexLeft).at(channel);
+            double leftNextValue = data.at(indexLeftNext).at(channel);
+
+            if (belongsTo(voltage, leftValue, leftNextValue) && leftValue < leftNextValue)
+                return -i;
+        }
+
+        if (indexRightNext < dataSize) {
+            double rightValue = data.at(indexRight).at(channel);
+            double rightNextValue = data.at(indexRightNext).at(channel);
+
+            if (belongsTo(voltage, rightValue, rightNextValue) && rightValue > rightNextValue)
+                return i;
+        }
+    }
+    return 0;
+}
+
+bool GaugePlot::belongsTo(double value, double a, double b) {
+    double min = std::min(a, b);
+    double max = std::max(a, b);
+    return value >= min && value <= max;
 }

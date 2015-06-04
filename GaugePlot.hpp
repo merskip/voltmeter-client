@@ -15,6 +15,7 @@ private:
 
     bool isFrameMode;
     double timeRange;
+    double triggerVoltage;
 
 public:
     GaugePlot();
@@ -27,6 +28,7 @@ public:
     }
 
     void setFrameMode(bool state);
+    void setTriggerVoltage(double voltage);
 
     QColor getChannelColor(int channel);
 
@@ -41,4 +43,7 @@ public slots:
 private:
     void setupGraphChannel(int channel, QColor color);
     void updateGraphChannel(int channel, double time, double voltage);
+
+    static int getShiftForTrigger(int channel, double voltage, QList<QVector<double>> &data);
+    static bool belongsTo(double value, double a, double b);
 };
