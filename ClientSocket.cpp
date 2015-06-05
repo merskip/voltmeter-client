@@ -5,10 +5,9 @@
 Measurement ClientSocket::downloadMeasurement() {
     this->write("get_one");
     this->waitForReadyRead(1000);
-    QByteArray raw_message = this->readAll();
-    QString message = QString(raw_message).trimmed();
+    QByteArray message = this->readLine();
 
-    QStringList dataList = message.split(' ');
+    QList<QByteArray> dataList = message.split(' ');
     if (dataList.size() < 5) {
         std::cerr << "error: unexception message: " << message.toStdString() << std::endl;
         return {};
@@ -43,14 +42,14 @@ QList<QVector<double>> ClientSocket::downloadFrame(int duration) {
     this->write(request);
 
     this->waitForReadyRead(1000);
-    QByteArray message = this->readLine().trimmed();
+    QByteArray message = this->readLine();
 
     int dataSize = message.toUInt();
 //    std::cout << "Liczba pomiarów: " << dataSize << std::endl;
 
     QList<QVector<double>> data;
     for (int i = 0; i < dataSize; i++) {
-        QByteArray line = this->readLine().trimmed();
+        QByteArray line = this->readLine();
         QList<QByteArray> lineSplit = line.split(' ');
 
         if (lineSplit.size() != 4) {
@@ -74,6 +73,23 @@ QList<QVector<double>> ClientSocket::downloadFrame(int duration) {
 
     emit frameDownloaded(duration, data);
     return data;
+}
+
+
+QByteArray ClientSocket::readLine() {
+    QByteArray line, fragment;
+
+    while (!line.contains('\n')) {
+        if (!bytesAvailable()) {
+            if (!waitForReadyRead())
+                break;
+        }
+
+        fragment = QIODevice::readLine();
+        line.append(fragment);
+    }
+
+    return line.trimmed();
 }
 
 double ClientSocket::toVoltage(int value) {

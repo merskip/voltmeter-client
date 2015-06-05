@@ -19,5 +19,6 @@ signals:
     void frameDownloaded(int duration, QList<QVector<double>> &data);
 
 private:
+    QByteArray readLine();
     double toVoltage(int value);
 };
