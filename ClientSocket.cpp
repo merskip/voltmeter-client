@@ -1,6 +1,14 @@
 #include <iostream>
+#include <QtCore/qthread.h>
 #include "ClientSocket.hpp"
 
+void ClientSocket::connectToServer(QString &host, quint16 &port) {
+    this->connectToHost(host, port);
+}
+
+void ClientSocket::disconnect() {
+    this->close();
+}
 
 Measurement ClientSocket::downloadMeasurement() {
     this->write("get_one");

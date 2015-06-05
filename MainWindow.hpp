@@ -7,16 +7,17 @@
 #include "ConnectionPanel.hpp"
 #include "SidePanel.hpp"
 
-
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
     bool isFrameMode = false;
     bool isSocketError = false;
+
     ClientSocket *clientSocket;
     GaugePlot *plot;
     QTimer *timer;
+    QThread *thread;
 
     ConnectionPanel *connectionPanel;
     ChannelPanel *channelPanel[5];
@@ -37,13 +38,10 @@ private:
     static QString socketErrorToString(QAbstractSocket::SocketError error);
 
 private slots:
-    void doConnect(QString &host, quint16 &port);
-    void doDisconnect();
+    void timerTick();
 
     void socketStateChanged(QAbstractSocket::SocketState state);
     void socketError(QAbstractSocket::SocketError error);
-
-    void timerTick();
 
     void timeRangeChanged(QTime time);
     void timeIntervalChanged(QTime time);
@@ -51,4 +49,8 @@ private slots:
     void frameModeChanged(bool isFrameMode);
 
     void voltageChanged(Measurement &data);
+
+signals:
+    void doDownloadMeasurement();
+    void doDownloadFrame(int duration);
 };

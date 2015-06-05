@@ -10,6 +10,10 @@ class ClientSocket : public QTcpSocket {
 public:
     ClientSocket() : QTcpSocket() { }
 
+public slots:
+    void connectToServer(QString &host, quint16 &port);
+    void disconnect();
+
     Measurement downloadMeasurement();
 
     QList<QVector<double>> downloadFrame(int duration);

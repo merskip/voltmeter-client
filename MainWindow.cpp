@@ -4,6 +4,10 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     clientSocket = new ClientSocket();
     plot = new GaugePlot();
     timer = new QTimer();
+
+    thread = new QThread();
+    clientSocket->moveToThread(thread);
+    thread->start();
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTick()));
 
     connectionPanel = new ConnectionPanel(serverHost, serverPort);
@@ -48,13 +52,23 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     connect(sidePanel->getTimeIntervalEdit(), SIGNAL(timeChanged(QTime)),
             this, SLOT(timeIntervalChanged(QTime)));
 
-    connect(connectionPanel, SIGNAL(doConnect(QString&, quint16&)),
-            this, SLOT(doConnect(QString&, quint16&)));
-    connect(connectionPanel, SIGNAL(doDisconnect()),
-            this, SLOT(doDisconnect()));
+    // Bez tego nie działa, dalsze połączenia nie będą działać
+    qRegisterMetaType<QString>("QString&");
+    qRegisterMetaType<quint16>("quint16&");
+    qRegisterMetaType<QAbstractSocket::SocketState>("QAbstractSocket::SocketState");
+    qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
+    qRegisterMetaType<Measurement>("Measurement&");
+    qRegisterMetaType<QList<QVector<double>>>("QList<QVector<double> >&");
 
-    connect(connectionPanel, SIGNAL(frameModeChanged(bool)),
-            this, SLOT(frameModeChanged(bool)));
+    connect(connectionPanel, SIGNAL(doConnect(QString&, quint16&)),
+            clientSocket, SLOT(connectToServer(QString&, quint16&)));
+    connect(connectionPanel, SIGNAL(doDisconnect()),
+            clientSocket, SLOT(disconnect()));
+
+    connect(this, SIGNAL(doDownloadMeasurement()),
+            clientSocket, SLOT(downloadMeasurement()));
+    connect(this, SIGNAL(doDownloadFrame(int)),
+            clientSocket, SLOT(downloadFrame(int)));
 
     connect(clientSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
             this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
@@ -69,6 +83,9 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     connect(clientSocket, SIGNAL(frameDownloaded(int, QList<QVector<double>>&)),
             plot, SLOT(showFrame(int, QList<QVector<double>>&)));
 
+    connect(connectionPanel, SIGNAL(frameModeChanged(bool)),
+            this, SLOT(frameModeChanged(bool)));
+
     timeRange = sidePanel->getTimeRangeMillis();
     timeInterval = sidePanel->getTimeIntervalMillis();
 
@@ -76,15 +93,12 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     statusBar()->show();
 }
 
-void MainWindow::doConnect(QString &host, quint16 &port) {
-    statusBar()->showMessage("Łączenie z " + toPrettyAddress(host, port) + "...");
-    isSocketError = false;
-    clientSocket->connectToHost(host, port);
-}
-
-void MainWindow::doDisconnect() {
-    timer->stop();
-    clientSocket->close();
+void MainWindow::timerTick() {
+    if (isFrameMode) {
+        emit doDownloadFrame(timeInterval);
+    } else {
+        emit doDownloadMeasurement();
+    }
 }
 
 void MainWindow::socketStateChanged(QAbstractSocket::SocketState state) {
@@ -103,6 +117,9 @@ void MainWindow::socketStateChanged(QAbstractSocket::SocketState state) {
 
         if (!isSocketError)
             statusBar()->showMessage("Rozłączono z serwerem");
+    } else if (state == QAbstractSocket::ConnectingState) {
+        statusBar()->showMessage("Łączenie z " + toPrettyPeerAddress(clientSocket) + "...");
+        isSocketError = false;
     }
 }
 
@@ -111,7 +128,6 @@ void MainWindow::socketError(QAbstractSocket::SocketError error) {
     statusBar()->showMessage("Wystąpił błąd: " + errorString);
     isSocketError = true;
 }
-
 
 QString MainWindow::toPrettyPeerAddress(QAbstractSocket *socket) {
     QString host = socket->peerAddress().toString();
@@ -125,13 +141,6 @@ QString MainWindow::toPrettyAddress(QString host, quint16 port) {
     address.append(":");
     address.append(QString::number(port));
     return address;
-}
-
-void MainWindow::timerTick() {
-    if (isFrameMode)
-        clientSocket->downloadFrame(timeInterval);
-    else
-        clientSocket->downloadMeasurement();
 }
 
 void MainWindow::voltageChanged(Measurement &data) {
