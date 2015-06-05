@@ -74,11 +74,11 @@ void GaugePlot::setFrameMode(bool state) {
     if (state) {
         clearAllChannel();
         xAxis->setTickLabelType(QCPAxis::LabelType::ltNumber);
-        xAxis->setTickStep(0);
+        xAxis->setTicks(false);
     } else {
         setTimeRange(timeRange);
         xAxis->setTickLabelType(QCPAxis::LabelType::ltDateTime);
-        xAxis->setAutoTicks(true);
+        xAxis->setTicks(true);
     }
 }
 
