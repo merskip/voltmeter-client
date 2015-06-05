@@ -96,7 +96,6 @@ void GaugePlot::setTriggerVoltage(double voltage) {
 }
 
 void GaugePlot::appendMeasurement(Measurement &data) {
-
     updateGraphChannel(1, data.time, data.channel[1].voltage);
     updateGraphChannel(2, data.time, data.channel[2].voltage);
     updateGraphChannel(3, data.time, data.channel[3].voltage);
@@ -104,6 +103,7 @@ void GaugePlot::appendMeasurement(Measurement &data) {
 
     xAxis->setRange(data.time, timeRange, Qt::AlignRight);
     replot();
+    emit isDone();
 }
 
 void GaugePlot::updateGraphChannel(int channel, double time, double voltage) {
@@ -133,6 +133,7 @@ void GaugePlot::showFrame(int duration, QList<QVector<double>> &data) {
     xAxis->setRange(0 + shift + (dataSize / 5), dataSize - 1 + shift - (dataSize / 5));
 
     replot();
+    emit isDone();
 }
 
 

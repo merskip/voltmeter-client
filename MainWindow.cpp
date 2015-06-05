@@ -52,7 +52,8 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     connect(sidePanel->getTimeIntervalEdit(), SIGNAL(timeChanged(QTime)),
             this, SLOT(timeIntervalChanged(QTime)));
 
-    // Bez tego nie działa, dalsze połączenia nie będą działać
+    // Bez tego nie działa,
+    // dalsze połączenia z clientSocket nie będą działać
     qRegisterMetaType<QString>("QString&");
     qRegisterMetaType<quint16>("quint16&");
     qRegisterMetaType<QAbstractSocket::SocketState>("QAbstractSocket::SocketState");
@@ -83,8 +84,13 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     connect(clientSocket, SIGNAL(frameDownloaded(int, QList<QVector<double>>&)),
             plot, SLOT(showFrame(int, QList<QVector<double>>&)));
 
+    connect(plot, SIGNAL(isDone()), this, SLOT(plotIsDone()));
+
     connect(connectionPanel, SIGNAL(frameModeChanged(bool)),
             this, SLOT(frameModeChanged(bool)));
+
+    connect(connectionPanel, SIGNAL(frameModeChanged(bool)),
+            plot, SLOT(setFrameMode(bool)));
 
     timeRange = sidePanel->getTimeRangeMillis();
     timeInterval = sidePanel->getTimeIntervalMillis();
@@ -99,6 +105,11 @@ void MainWindow::timerTick() {
     } else {
         emit doDownloadMeasurement();
     }
+}
+
+void MainWindow::plotIsDone() {
+    if (isFrameMode)
+        timer->start(0);
 }
 
 void MainWindow::socketStateChanged(QAbstractSocket::SocketState state) {
@@ -171,7 +182,16 @@ void MainWindow::timeIntervalChanged(QTime time) {
 
 void MainWindow::frameModeChanged(bool isFrameMode) {
     this->isFrameMode = isFrameMode;
-    plot->setFrameMode(isFrameMode);
+
+    if (isFrameMode) {
+        timer->setSingleShot(true);
+    } else {
+        timer->setSingleShot(false);
+        timer->setInterval(timeInterval);
+    }
+
+    if (clientSocket->isConnected())
+        timer->start();
 }
 
 QString MainWindow::socketErrorToString(QAbstractSocket::SocketError error) {

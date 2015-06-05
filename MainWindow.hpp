@@ -40,6 +40,8 @@ private:
 private slots:
     void timerTick();
 
+    void plotIsDone();
+
     void socketStateChanged(QAbstractSocket::SocketState state);
     void socketError(QAbstractSocket::SocketError error);
 

@@ -13,7 +13,6 @@ private:
     QCPGraph *graph[5];
     QCPGraph *dot[5];
 
-    bool isFrameMode;
     double timeRange;
     double triggerVoltage;
 
@@ -27,7 +26,6 @@ public:
         return timeRange;
     }
 
-    void setFrameMode(bool state);
     void setTriggerVoltage(double voltage);
 
     QColor getChannelColor(int channel);
@@ -35,6 +33,7 @@ public:
     void clearAllChannel();
 
 public slots:
+    void setFrameMode(bool state);
     void setChannelVisible(int channel, bool on);
     void appendMeasurement(Measurement &data);
 
@@ -46,4 +45,7 @@ private:
 
     static int getShiftForTrigger(int channel, double voltage, QList<QVector<double>> &data);
     static bool belongsTo(double value, double a, double b);
+
+signals:
+    void isDone();
 };

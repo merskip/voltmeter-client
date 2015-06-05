@@ -10,6 +10,10 @@ class ClientSocket : public QTcpSocket {
 public:
     ClientSocket() : QTcpSocket() { }
 
+    inline bool isConnected() {
+        return state() == ConnectedState;
+    }
+
 public slots:
     void connectToServer(QString &host, quint16 &port);
     void disconnect();
