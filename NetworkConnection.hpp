@@ -1,0 +1,31 @@
+#pragma once
+
+#include "IODeviceConnection.hpp"
+#include <QTcpSocket>
+#include <QHostAddress>
+
+class NetworkConnection : public IODeviceConnection {
+    Q_OBJECT
+
+protected:
+    QTcpSocket *socket;
+
+public:
+    NetworkConnection(QTcpSocket *socket = new QTcpSocket());
+
+    virtual void connect(Params params);
+
+    virtual QString toStringAddress();
+
+private slots:
+    void socketStateChanged(QAbstractSocket::SocketState socketState);
+    void socketError(QAbstractSocket::SocketError socketError);
+
+private:
+    static QString socketErrorToString(QAbstractSocket::SocketError error);
+
+public:
+    virtual Measurement downloadOne();
+
+    virtual Frame downloadFrame(int duration);
+};

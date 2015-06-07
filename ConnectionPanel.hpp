@@ -5,23 +5,16 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QCheckBox>
-#include <QAbstractSocket>
+#include "Connection.hpp"
 
 class ConnectionPanel : public QWidget {
     Q_OBJECT
-
-public:
-    enum ConnectionState {
-        Connected,
-        Disconnected,
-        Connecting
-    };
 
 private:
     QLineEdit *hostEdit;
     QSpinBox *portEdit;
 
-    ConnectionState connectionState;
+    Connection::State connectionState;
     QPushButton *connectBtn;
 
     QCheckBox *frameModeCheck;
@@ -36,11 +29,10 @@ private slots:
     void handleFrameModeStateChanged(int state);
 
 public slots:
-    void setConnectState(QAbstractSocket::SocketState state);
-    void setConnectState(ConnectionState state);
+    void setConnectionState(Connection::State state);
 
 signals:
-    void doConnect(QString &host, quint16 &port);
+    void doConnect(Connection::Params params);
     void doDisconnect();
 
     void frameModeChanged(bool isFrameMode);

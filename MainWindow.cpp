@@ -1,12 +1,14 @@
 #include "MainWindow.hpp"
+#include "NetworkConnection.hpp"
 
 MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
-    clientSocket = new ClientSocket();
+    connection = new NetworkConnection();
     plot = new GaugePlot();
     timer = new QTimer();
 
     thread = new QThread();
-    clientSocket->moveToThread(thread);
+    ((NetworkConnection*) connection)->getDevice()->moveToThread(thread);
+    connection->moveToThread(thread);
     thread->start();
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTick()));
 
@@ -52,37 +54,41 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     connect(sidePanel->getTimeIntervalEdit(), SIGNAL(timeChanged(QTime)),
             this, SLOT(timeIntervalChanged(QTime)));
 
-    // Bez tego nie działa,
-    // dalsze połączenia z clientSocket nie będą działać
-    qRegisterMetaType<QString>("QString&");
-    qRegisterMetaType<quint16>("quint16&");
-    qRegisterMetaType<QAbstractSocket::SocketState>("QAbstractSocket::SocketState");
-    qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
+    // Wymagana rejestracja typów,
+    // bez tego dalsze połączenia z Connection nie będą działać
+    qRegisterMetaType<Connection::Params>("Connection::Params");
+    qRegisterMetaType<Connection::State>("Connection::State");
     qRegisterMetaType<Measurement>("Measurement&");
-    qRegisterMetaType<QList<QVector<double>>>("QList<QVector<double> >&");
+    qRegisterMetaType<Connection::Frame>("Connection::Frame&");
 
-    connect(connectionPanel, SIGNAL(doConnect(QString&, quint16&)),
-            clientSocket, SLOT(connectToServer(QString&, quint16&)));
+    connect(connectionPanel, SIGNAL(doConnect(Connection::Params)),
+            connection, SLOT(connect(Connection::Params)));
     connect(connectionPanel, SIGNAL(doDisconnect()),
-            clientSocket, SLOT(disconnect()));
+            connection, SLOT(disconnect()));
 
-    connect(this, SIGNAL(doDownloadMeasurement()),
-            clientSocket, SLOT(downloadMeasurement()));
+    connect(connection, SIGNAL(stateChanged(Connection::State)),
+            this, SLOT(connectionStateChanged(Connection::State)));
+    connect(connection, SIGNAL(stateChanged(Connection::State)),
+            connectionPanel, SLOT(setConnectionState(Connection::State)));
+
+    connect(connection, SIGNAL(errorOccurred(QString)),
+            this, SLOT(connectionErrorOccurred(QString)));
+
+    connect(connection, SIGNAL(connected()),
+            this, SLOT(doStart()));
+
+    connect(this, SIGNAL(doDownloadOne()),
+            connection, SLOT(downloadOne()));
     connect(this, SIGNAL(doDownloadFrame(int)),
-            clientSocket, SLOT(downloadFrame(int)));
+            connection, SLOT(downloadFrame(int)));
 
-    connect(clientSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
-            this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-    connect(clientSocket, SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SLOT(socketError(QAbstractSocket::SocketError)));
-
-    connect(clientSocket, SIGNAL(measurementDownloaded(Measurement&)),
+    connect(connection, SIGNAL(downloadedOne(Measurement&)),
             plot, SLOT(appendMeasurement(Measurement&)));
-    connect(clientSocket, SIGNAL(measurementDownloaded(Measurement&)),
+    connect(connection, SIGNAL(downloadedOne(Measurement&)),
             this, SLOT(voltageChanged(Measurement&)));
 
-    connect(clientSocket, SIGNAL(frameDownloaded(int, QList<QVector<double>>&)),
-            plot, SLOT(showFrame(int, QList<QVector<double>>&)));
+    connect(connection, SIGNAL(downloadedFrame(Connection::Frame&)),
+            plot, SLOT(showFrame(Connection::Frame&)));
 
     connect(plot, SIGNAL(isDone()), this, SLOT(plotIsDone()));
 
@@ -103,7 +109,7 @@ void MainWindow::timerTick() {
     if (isFrameMode) {
         emit doDownloadFrame(timeInterval);
     } else {
-        emit doDownloadMeasurement();
+        emit doDownloadOne();
     }
 }
 
@@ -112,46 +118,36 @@ void MainWindow::plotIsDone() {
         timer->start(0);
 }
 
-void MainWindow::socketStateChanged(QAbstractSocket::SocketState state) {
-    connectionPanel->setConnectState(state);
+void MainWindow::doStart() {
+    plot->setTimeRange(timeRange / 1000);
+    timer->start(timeInterval);
+}
 
-    if (state == QAbstractSocket::ConnectedState) {
-        QString serverAddress = toPrettyPeerAddress(clientSocket);
-        statusBar()->showMessage("Połączono z " + serverAddress);
+void MainWindow::connectionStateChanged(Connection::State state) {
+
+    if (state == Connection::Connected) {
+        QString address = connection->toStringAddress();
+        statusBar()->showMessage("Połączono z " + address);
 
         plot->setTimeRange(timeRange / 1000);
         timer->start(timeInterval);
-    } else if (state == QAbstractSocket::UnconnectedState) {
+    } else if (state == Connection::Disconnected) {
         timer->stop();
         plot->clearAllChannel();
         setNullVoltage();
 
         if (!isSocketError)
             statusBar()->showMessage("Rozłączono z serwerem");
-    } else if (state == QAbstractSocket::ConnectingState) {
-        statusBar()->showMessage("Łączenie z " + toPrettyPeerAddress(clientSocket) + "...");
+    } else if (state == Connection::Connecting) {
+        QString address = connection->toStringAddress();
+        statusBar()->showMessage("Łączenie z " + address + "...");
         isSocketError = false;
     }
 }
 
-void MainWindow::socketError(QAbstractSocket::SocketError error) {
-    QString errorString = socketErrorToString(error).toLower();
-    statusBar()->showMessage("Wystąpił błąd: " + errorString);
+void MainWindow::connectionErrorOccurred(QString error) {
+    statusBar()->showMessage("Wystąpił błąd: " + error.toLower());
     isSocketError = true;
-}
-
-QString MainWindow::toPrettyPeerAddress(QAbstractSocket *socket) {
-    QString host = socket->peerAddress().toString();
-    quint16 port = socket->peerPort();
-    return toPrettyAddress(host, port);
-}
-
-QString MainWindow::toPrettyAddress(QString host, quint16 port) {
-    QString address;
-    address.append(host);
-    address.append(":");
-    address.append(QString::number(port));
-    return address;
 }
 
 void MainWindow::voltageChanged(Measurement &data) {
@@ -190,60 +186,6 @@ void MainWindow::frameModeChanged(bool isFrameMode) {
         timer->setInterval(timeInterval);
     }
 
-    if (clientSocket->isConnected())
+    if (connection->isConnected())
         timer->start();
-}
-
-QString MainWindow::socketErrorToString(QAbstractSocket::SocketError error) {
-    switch (error) {
-        case QAbstractSocket::ConnectionRefusedError:
-            return "Połączenie zostało odrzucone";
-        case QAbstractSocket::RemoteHostClosedError:
-            return "Zdalny host zakończył połączenie";
-        case QAbstractSocket::HostNotFoundError:
-            return "Adres nie został znaleziony";
-        case QAbstractSocket::SocketAccessError:
-            return "Aplikacja nie posiada odpowiednich uprawnień";
-        case QAbstractSocket::SocketResourceError:
-            return "Zbyt mało zasobów do utworzenia gniazda";
-        case QAbstractSocket::SocketTimeoutError:
-            return "Minął limit czasu operacji";
-        case QAbstractSocket::DatagramTooLargeError:
-            return "Datagram był większy niż limit systemu operacyjnego";
-        case QAbstractSocket::NetworkError:
-            return "Wystąpił problem z siecią";
-        case QAbstractSocket::AddressInUseError:
-            return "Adres jest już w użyciu";
-        case QAbstractSocket::SocketAddressNotAvailableError:
-            return "Adres nie jest dostępny";
-        case QAbstractSocket::UnsupportedSocketOperationError:
-            return "Żądana operacja nie jest wspierana";
-        case QAbstractSocket::UnfinishedSocketOperationError:
-            return "Ostatnia operacja jeszcze się nie zakończyła";
-        case QAbstractSocket::ProxyAuthenticationRequiredError:
-            return "Wymagana autoryzacja przez serwer proxy";
-        case QAbstractSocket::SslHandshakeFailedError:
-            return "Nie udał się SSL/TLS handshake";
-        case QAbstractSocket::ProxyConnectionRefusedError:
-            return "Nie można połączyć się z serwerem proxy";
-        case QAbstractSocket::ProxyConnectionClosedError:
-            return "Połączenie z serwerem proxy zostało nieoczekiwanie zamknięte";
-        case QAbstractSocket::ProxyConnectionTimeoutError:
-            return "Połączenie z serwerem proxy przekroczyło limit czasu";
-        case QAbstractSocket::ProxyNotFoundError:
-            return "Adres proxy nie został odnaleziony";
-        case QAbstractSocket::ProxyProtocolError:
-            return "Błąd protokołu proxy";
-        case QAbstractSocket::OperationError:
-            return "Próbowano wykonać niedozwoloną operacją";
-        case QAbstractSocket::SslInternalError:
-            return "Wewnętrzny błąd biblioteki SSL";
-        case QAbstractSocket::SslInvalidUserDataError:
-            return "Nieprawidłowe dane dostarczone do biblioteki SSL";
-        case QAbstractSocket::TemporaryError:
-            return "Chwilowy błąd";
-        case QAbstractSocket::UnknownSocketError:
-        default:
-            return "Wystąpił niezdefiniowany błąd";
-    }
 }

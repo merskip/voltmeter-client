@@ -2,8 +2,8 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include "Connection.hpp"
 #include "GaugePlot.hpp"
-#include "ClientSocket.hpp"
 #include "ConnectionPanel.hpp"
 #include "SidePanel.hpp"
 
@@ -14,7 +14,7 @@ private:
     bool isFrameMode = false;
     bool isSocketError = false;
 
-    ClientSocket *clientSocket;
+    Connection *connection;
     GaugePlot *plot;
     QTimer *timer;
     QThread *thread;
@@ -29,21 +29,19 @@ private:
 public:
     MainWindow(QString serverHost, quint16 serverPort);
 
-    static QString toPrettyPeerAddress(QAbstractSocket *socket);
-    static QString toPrettyAddress(QString host, quint16 port);
-
-private:
-    void setNullVoltage();
-
-    static QString socketErrorToString(QAbstractSocket::SocketError error);
+signals:
+    void doDownloadOne();
+    void doDownloadFrame(int duration);
 
 private slots:
     void timerTick();
 
     void plotIsDone();
 
-    void socketStateChanged(QAbstractSocket::SocketState state);
-    void socketError(QAbstractSocket::SocketError error);
+    void doStart();
+
+    void connectionStateChanged(Connection::State state);
+    void connectionErrorOccurred(QString error);
 
     void timeRangeChanged(QTime time);
     void timeIntervalChanged(QTime time);
@@ -52,7 +50,6 @@ private slots:
 
     void voltageChanged(Measurement &data);
 
-signals:
-    void doDownloadMeasurement();
-    void doDownloadFrame(int duration);
+private:
+    void setNullVoltage();
 };

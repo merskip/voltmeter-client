@@ -114,7 +114,7 @@ void GaugePlot::updateGraphChannel(int channel, double time, double voltage) {
     dot[channel]->addData(time, voltage);
 }
 
-void GaugePlot::showFrame(int duration, QList<QVector<double>> &data) {
+void GaugePlot::showFrame(Connection::Frame &data) {
     graph[1]->clearData();
     graph[2]->clearData();
     graph[3]->clearData();

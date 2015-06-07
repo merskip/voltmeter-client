@@ -5,6 +5,7 @@
 #include <QtNetwork/QHostAddress>
 #include "lib/qcustomplot.h"
 #include "Measurement.hpp"
+#include "Connection.hpp"
 
 class GaugePlot : public QCustomPlot {
     Q_OBJECT
@@ -37,7 +38,7 @@ public slots:
     void setChannelVisible(int channel, bool on);
     void appendMeasurement(Measurement &data);
 
-    void showFrame(int duration, QList<QVector<double>> &data);
+    void showFrame(Connection::Frame &frame);
 
 private:
     void setupGraphChannel(int channel, QColor color);

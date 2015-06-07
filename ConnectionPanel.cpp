@@ -32,7 +32,7 @@ ConnectionPanel::ConnectionPanel(QString host, quint16 port) {
     layout->addWidget(frameModeCheck);
     setLayout(layout);
 
-    setConnectState(ConnectionState::Disconnected);
+    setConnectionState(Connection::Disconnected);
 
     connect(connectBtn, SIGNAL(clicked()),
             this, SLOT(handleConnectBtn()));
@@ -42,40 +42,32 @@ ConnectionPanel::ConnectionPanel(QString host, quint16 port) {
 }
 
 void ConnectionPanel::handleConnectBtn() {
-    if (connectionState == Disconnected) {
+    if (connectionState == Connection::Disconnected) {
         QString host = hostEdit->text();
         quint16 port = (quint16) portEdit->value();
-        emit doConnect(host, port);
-    } else if (connectionState == Connected){
+
+        Connection::Params params;
+        params.append(host.toUtf8());
+        params.append(QString::number(port).toUtf8());
+        emit doConnect(params);
+    } else if (connectionState == Connection::Connected){
         emit doDisconnect();
     } else {
         // Nic
     }
 }
 
-
-void ConnectionPanel::setConnectState(QAbstractSocket::SocketState state) {
-    if (state == QAbstractSocket::ConnectedState)
-        setConnectState(Connected);
-    else if (state == QAbstractSocket::UnconnectedState)
-        setConnectState(Disconnected);
-    else if (state == QAbstractSocket::ConnectingState)
-        setConnectState(Connecting);
-    else
-        ; // Ignorowanie reszty stanów
-}
-
-void ConnectionPanel::setConnectState(ConnectionState state) {
+void ConnectionPanel::setConnectionState(Connection::State state) {
     switch (state) {
-        case Connected:
+        case Connection::Connected:
             connectBtn->setText("Rozłącz");
             connectBtn->setEnabled(true);
             break;
-        case Disconnected:
+        case Connection::Disconnected:
             connectBtn->setText("Połącz");
             connectBtn->setEnabled(true);
             break;
-        case Connecting:
+        case Connection::Connecting:
             connectBtn->setText("Połącz");
             connectBtn->setEnabled(false);
             break;
