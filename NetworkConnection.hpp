@@ -7,6 +7,10 @@
 class NetworkConnection : public IODeviceConnection {
     Q_OBJECT
 
+private:
+    QString serverHost;
+    quint16 serverPort;
+
 protected:
     QTcpSocket *socket;
 

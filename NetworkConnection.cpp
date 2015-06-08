@@ -17,19 +17,19 @@ void NetworkConnection::connect(Params params) {
         throw QString("Too few arguments");
 
     bool ok;
-    QString host = QString(params[0]);
-    quint16 port = (quint16) params[1].toUInt(&ok);
+    serverHost = QString(params[0]);
+    serverPort = (quint16) params[1].toUInt(&ok);
 
     if (!ok) throw QString("Invalid port");
 
-    socket->connectToHost(host, port);
+    socket->connectToHost(serverHost, serverPort);
 }
 
 QString NetworkConnection::toStringAddress() {
     QString addr;
-    addr += socket->peerAddress().toString();
+    addr += serverHost;
     addr += ":";
-    addr += QString::number(socket->peerPort());
+    addr += QString::number(serverPort);
     return addr;
 }
 
