@@ -27,7 +27,7 @@ private:
     int timeInterval;
 
 public:
-    MainWindow(QString serverHost, quint16 serverPort);
+    MainWindow();
 
 signals:
     void doDownloadOne();

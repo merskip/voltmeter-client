@@ -1,7 +1,7 @@
 #include "MainWindow.hpp"
 #include "NetworkConnection.hpp"
 
-MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
+MainWindow::MainWindow() {
     connection = new NetworkConnection();
     plot = new GaugePlot();
     timer = new QTimer();
@@ -12,7 +12,7 @@ MainWindow::MainWindow(QString serverHost, quint16 serverPort) {
     thread->start();
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTick()));
 
-    connectionPanel = new ConnectionPanel(serverHost, serverPort);
+    connectionPanel = new ConnectionPanel();
     sidePanel = new SidePanel();
 
     plot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

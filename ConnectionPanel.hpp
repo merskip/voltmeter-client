@@ -7,6 +7,9 @@
 #include <QCheckBox>
 #include "Connection.hpp"
 
+#define DEFAULT_NETWORK_HOST "192.168.1.8"
+#define DEFAULT_NETWORK_PORT 22444
+
 class ConnectionPanel : public QWidget {
     Q_OBJECT
 
@@ -20,7 +23,7 @@ private:
     QCheckBox *frameModeCheck;
 
 public:
-    ConnectionPanel(QString host, quint16 port);
+    ConnectionPanel();
 
     bool isFrameMode();
 

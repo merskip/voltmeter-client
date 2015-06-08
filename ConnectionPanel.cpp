@@ -2,15 +2,15 @@
 #include <QLabel>
 #include "ConnectionPanel.hpp"
 
-ConnectionPanel::ConnectionPanel(QString host, quint16 port) {
+ConnectionPanel::ConnectionPanel() {
     hostEdit = new QLineEdit();
-    hostEdit->setText(host);
+    hostEdit->setText(DEFAULT_NETWORK_HOST);
     hostEdit->setPlaceholderText("host/ip");
     hostEdit->setFixedWidth(250);
 
     portEdit = new QSpinBox();
     portEdit->setRange(1, 65535);
-    portEdit->setValue(port);
+    portEdit->setValue(DEFAULT_NETWORK_PORT);
 
     connectBtn = new QPushButton();
 
