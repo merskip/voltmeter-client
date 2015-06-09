@@ -114,6 +114,7 @@ void NetworkConnection::socketStateChanged(QAbstractSocket::SocketState socketSt
 }
 
 void NetworkConnection::socketError(QAbstractSocket::SocketError socketError) {
+    closeConnection();
     QString error = socketErrorToString(socketError);
     emit errorOccurred(error);
 }

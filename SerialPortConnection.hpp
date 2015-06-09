@@ -1,9 +1,7 @@
 #pragma once
 
 #include "IODeviceConnection.hpp"
-#include <QTcpSocket>
-#include <QHostAddress>
-#include <QtSerialPort/qserialport.h>
+#include <QSerialPort>
 
 class SerialPortConnection : public IODeviceConnection {
     Q_OBJECT

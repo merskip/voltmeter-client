@@ -1,7 +1,10 @@
 #include <iostream>
+#include <QThread>
 #include "SerialPortConnection.hpp"
 
 void SerialPortConnection::createConnection() {
+    emit stateChanged(Connecting);
+
     serial = new QSerialPort();
     device = serial;
 
@@ -18,7 +21,6 @@ void SerialPortConnection::createConnection() {
         emit stateChanged(Disconnected);
     }
 }
-
 
 void SerialPortConnection::closeConnection() {
     IODeviceConnection::closeConnection();
@@ -108,10 +110,10 @@ Connection::Frame SerialPortConnection::downloadFrame(int duration) {
 
 void SerialPortConnection::serialError(QSerialPort::SerialPortError serialError) {
     if (serialError != QSerialPort::NoError) {
+        closeConnection();
         QString error =  serialErrorToString(serialError);
         emit errorOccurred(error);
     }
-
 }
 
 QString SerialPortConnection::serialErrorToString(QSerialPort::SerialPortError error) {

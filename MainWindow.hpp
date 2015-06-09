@@ -11,6 +11,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
+    bool isBusy = false;
     bool isFrameMode = false;
     bool isSocketError = false;
 

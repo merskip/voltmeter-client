@@ -9,7 +9,7 @@ QByteArray IODeviceConnection::readOneLine() {
 
     while (!line.contains('\n')) {
         if (!device->bytesAvailable()) {
-            if (!device->waitForReadyRead(1000))
+            if (!device->isReadable() || !device->waitForReadyRead(1000))
                 break;
         }
 

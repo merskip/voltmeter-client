@@ -118,19 +118,24 @@ Connection *MainWindow::getConnection() {
 }
 
 void MainWindow::timerTick() {
-    if (isFrameMode) {
-        emit doDownloadFrame(timeInterval);
-    } else {
-        emit doDownloadOne();
+    if (!isBusy) {
+        isBusy = true;
+        if (isFrameMode) {
+            emit doDownloadFrame(timeInterval);
+        } else {
+            emit doDownloadOne();
+        }
     }
 }
 
 void MainWindow::plotIsDone() {
+    isBusy = false;
     if (isFrameMode)
         timer->start(0);
 }
 
 void MainWindow::doStart() {
+    isBusy = false;
     plot->setTimeRange(timeRange / 1000);
     timer->start(timeInterval);
 }
