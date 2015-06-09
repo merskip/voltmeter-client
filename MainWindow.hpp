@@ -29,6 +29,11 @@ private:
 public:
     MainWindow();
 
+    Connection *getConnection();
+
+public slots:
+    void setConnection(Connection *connection);
+
 signals:
     void doDownloadOne();
     void doDownloadFrame(int duration);

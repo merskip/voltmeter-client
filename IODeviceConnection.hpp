@@ -9,7 +9,7 @@ class IODeviceConnection : public Connection {
 protected:
     QIODevice *device;
 
-    IODeviceConnection(QIODevice *device)
+    IODeviceConnection(QIODevice *device = nullptr)
             : device(device) { }
 
     QByteArray readOneLine();

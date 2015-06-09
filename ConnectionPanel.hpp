@@ -63,6 +63,8 @@ public slots:
     void setConnectionState(Connection::State state);
 
 signals:
+    void connectionChanged(Connection *connection);
+
     void doConnect(Connection::Params params);
     void doDisconnect();
 

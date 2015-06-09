@@ -1,14 +1,11 @@
 #include "MainWindow.hpp"
-#include "NetworkConnection.hpp"
 
 MainWindow::MainWindow() {
-    connection = new NetworkConnection();
+    connection = nullptr;
     plot = new GaugePlot();
     timer = new QTimer();
 
     thread = new QThread();
-    ((NetworkConnection*) connection)->getDevice()->moveToThread(thread);
-    connection->moveToThread(thread);
     thread->start();
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTick()));
 
@@ -61,6 +58,32 @@ MainWindow::MainWindow() {
     qRegisterMetaType<Measurement>("Measurement&");
     qRegisterMetaType<Connection::Frame>("Connection::Frame&");
 
+    connect(connectionPanel, SIGNAL(connectionChanged(Connection*)),
+            this, SLOT(setConnection(Connection*)));
+
+    connect(plot, SIGNAL(isDone()), this, SLOT(plotIsDone()));
+
+    connect(connectionPanel, SIGNAL(frameModeChanged(bool)),
+            this, SLOT(frameModeChanged(bool)));
+
+    connect(connectionPanel, SIGNAL(frameModeChanged(bool)),
+            plot, SLOT(setFrameMode(bool)));
+
+    timeRange = sidePanel->getTimeRangeMillis();
+    timeInterval = sidePanel->getTimeIntervalMillis();
+
+    setNullVoltage();
+    statusBar()->show();
+}
+
+
+void MainWindow::setConnection(Connection *connection) {
+    if (this->connection != nullptr)
+        delete this->connection;
+
+    this->connection = connection;
+    this->connection->moveToThread(thread);
+
     connect(connectionPanel, SIGNAL(doConnect(Connection::Params)),
             connection, SLOT(connect(Connection::Params)));
     connect(connectionPanel, SIGNAL(doDisconnect()),
@@ -89,20 +112,10 @@ MainWindow::MainWindow() {
 
     connect(connection, SIGNAL(downloadedFrame(Connection::Frame&)),
             plot, SLOT(showFrame(Connection::Frame&)));
+}
 
-    connect(plot, SIGNAL(isDone()), this, SLOT(plotIsDone()));
-
-    connect(connectionPanel, SIGNAL(frameModeChanged(bool)),
-            this, SLOT(frameModeChanged(bool)));
-
-    connect(connectionPanel, SIGNAL(frameModeChanged(bool)),
-            plot, SLOT(setFrameMode(bool)));
-
-    timeRange = sidePanel->getTimeRangeMillis();
-    timeInterval = sidePanel->getTimeIntervalMillis();
-
-    setNullVoltage();
-    statusBar()->show();
+Connection *MainWindow::getConnection() {
+    return connection;
 }
 
 void MainWindow::timerTick() {

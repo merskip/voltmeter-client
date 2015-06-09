@@ -1,17 +1,6 @@
 #include <iostream>
 #include "NetworkConnection.hpp"
 
-NetworkConnection::NetworkConnection(QTcpSocket *socket)
-        : IODeviceConnection(socket),
-          socket(socket) {
-
-    QObject::connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
-                     this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-
-    QObject::connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
-                     this, SLOT(socketError(QAbstractSocket::SocketError)));
-}
-
 void NetworkConnection::connect(Params params) {
     if (params.size() < 2)
         throw QString("Too few arguments");
@@ -21,6 +10,15 @@ void NetworkConnection::connect(Params params) {
     serverPort = (quint16) params[1].toUInt(&ok);
 
     if (!ok) throw QString("Invalid port");
+
+    socket = new QTcpSocket();
+    device = socket;
+
+    QObject::connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
+                     this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
+
+    QObject::connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
+                     this, SLOT(socketError(QAbstractSocket::SocketError)));
 
     socket->connectToHost(serverHost, serverPort);
 }

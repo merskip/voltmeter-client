@@ -15,7 +15,7 @@ protected:
     QTcpSocket *socket;
 
 public:
-    NetworkConnection(QTcpSocket *socket = new QTcpSocket());
+    NetworkConnection() { }
 
     virtual void connect(Params params);
 

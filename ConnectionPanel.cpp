@@ -1,6 +1,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include "ConnectionPanel.hpp"
+#include "NetworkConnection.hpp"
 
 ConnectionPanel::ConnectionPanel() {
     typeSelect = new QComboBox();
@@ -107,6 +108,8 @@ void ConnectionPanel::handleConnectBtn() {
 void ConnectionPanel::sendDoConnect() {
     Type type = typeSelect->currentData().value<Type>();
     if (type == Type::Network) {
+        emit connectionChanged(new NetworkConnection());
+
         QString host = network.hostEdit->text();
         quint16 port = (quint16) network.portEdit->value();
 
