@@ -12,13 +12,13 @@ protected:
     IODeviceConnection(QIODevice *device = nullptr)
             : device(device) { }
 
-    QByteArray readOneLine();
-
-public:
-    virtual void disconnect();
-
     QIODevice *getDevice() const {
         return device;
     }
+
+    QByteArray readOneLine();
+
+public slots:
+    virtual void closeConnection();
 
 };

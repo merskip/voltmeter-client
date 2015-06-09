@@ -25,9 +25,13 @@ public:
         this->serverPort = serverPort;
     }
 
-    virtual void connect();
-
     virtual QString toStringAddress();
+
+public slots:
+    virtual void createConnection();
+
+    virtual Measurement downloadOne();
+    virtual Frame downloadFrame(int duration);
 
 private slots:
     void socketStateChanged(QAbstractSocket::SocketState socketState);
@@ -36,8 +40,5 @@ private slots:
 private:
     static QString socketErrorToString(QAbstractSocket::SocketError error);
 
-public:
-    virtual Measurement downloadOne();
 
-    virtual Frame downloadFrame(int duration);
 };

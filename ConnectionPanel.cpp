@@ -1,7 +1,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QtSerialPort/qserialportinfo.h>
 #include "ConnectionPanel.hpp"
 #include "NetworkConnection.hpp"
+#include "SerialPortConnection.hpp"
 
 ConnectionPanel::ConnectionPanel() {
     typeSelect = new QComboBox();
@@ -41,6 +43,7 @@ ConnectionPanel::ConnectionPanel() {
 void ConnectionPanel::handleTypeChanged(int index) {
     QVariant data = typeSelect->itemData(index);
     Type type = (Type) data.toInt();
+    this->currentType = type;
     setupParamsLayout(type);
 }
 
@@ -54,6 +57,9 @@ void ConnectionPanel::setupParamsLayout(Type type) {
     switch (type) {
         case Network:
             setupNetworkLayout(contentLayout);
+            break;
+        case SerialPort:
+            setupSerialLayout(contentLayout);
             break;
         default: break; // Nic, pusty layout
     }
@@ -81,8 +87,6 @@ void ConnectionPanel::setupNetworkLayout(QHBoxLayout *layout) {
 
     network.hostEdit = new QLineEdit();
     network.hostEdit->setText(DEFAULT_NETWORK_HOST);
-    network.hostEdit->setPlaceholderText("host/ip");
-    network.hostEdit->setMaximumWidth(250);
 
     network.portEdit = new QSpinBox();
     network.portEdit->setRange(1, 65535);
@@ -92,6 +96,41 @@ void ConnectionPanel::setupNetworkLayout(QHBoxLayout *layout) {
     layout->addWidget(network.hostEdit);
     layout->addWidget(network.portLabel);
     layout->addWidget(network.portEdit);
+    layout->addWidget(connectBtn);
+}
+
+void ConnectionPanel::setupSerialLayout(QHBoxLayout *layout) {
+    serial.portNameLabel = new QLabel("Port:");
+    serial.baudRateLabel = new QLabel("Prędkość:");
+
+    serial.portNameSelect = new QComboBox();
+    for (auto portInfo : QSerialPortInfo::availablePorts()) {
+        QString text = portInfo.systemLocation();
+        QString data = portInfo.portName();
+        serial.portNameSelect->addItem(text, data);
+
+        if (portInfo.portName() == DEFAULT_SERIAL_PORT_NAME) {
+            int index= serial.portNameSelect->count();
+            serial.portNameSelect->setCurrentIndex(index);
+        }
+    }
+
+    serial.baudRateSelect = new QComboBox();
+    for (auto baudRate : QSerialPortInfo::standardBaudRates()) {
+        QString text = QString::number(baudRate);
+        qint32 data = baudRate;
+        serial.baudRateSelect->addItem(text, data);
+
+        if (baudRate == DEFAULT_SERIAL_BAUD_RATE) {
+            int index= serial.baudRateSelect->count() - 1;
+            serial.baudRateSelect->setCurrentIndex(index);
+        }
+    }
+
+    layout->addWidget(serial.portNameLabel);
+    layout->addWidget(serial.portNameSelect);
+    layout->addWidget(serial.baudRateLabel);
+    layout->addWidget(serial.baudRateSelect);
     layout->addWidget(connectBtn);
 }
 
@@ -106,23 +145,45 @@ void ConnectionPanel::handleConnectBtn() {
 
 
 void ConnectionPanel::sendDoConnect() {
-    Type type = typeSelect->currentData().value<Type>();
-    if (type == Type::Network) {
-        QString host = network.hostEdit->text();
-        quint16 port = (quint16) network.portEdit->value();
-
-        NetworkConnection *connection = new NetworkConnection();
-        connection->setServerHost(host);
-        connection->setServerPort(port);
-        emit connectionChanged(connection);
-
-        emit doConnect();
-    } else {
-        throw QString("Not implemented yet");
+    switch (currentType) {
+        case Network:
+            sendDoConnectNetwork();
+            break;
+        case SerialPort:
+            sendDoConnectSerialPort();
+            break;
+        default:
+            throw QString("Not implemented yet");
     }
 }
 
+
+void ConnectionPanel::sendDoConnectNetwork() {
+    QString host = network.hostEdit->text();
+    quint16 port = (quint16) network.portEdit->value();
+
+    NetworkConnection *connection = new NetworkConnection();
+    connection->setServerHost(host);
+    connection->setServerPort(port);
+    emit connectionChanged(connection);
+
+    emit doConnect();
+}
+
+void ConnectionPanel::sendDoConnectSerialPort() {
+    QString portName = serial.portNameSelect->currentData().toString();
+    qint32 baudRate = serial.baudRateSelect->currentData().toInt();
+
+    SerialPortConnection *connection = new SerialPortConnection();
+    connection->setPortName(portName);
+    connection->setBaudRate(baudRate);
+    emit connectionChanged(connection);
+
+    emit doConnect();
+}
+
 void ConnectionPanel::setConnectionState(Connection::State state) {
+    connectionState = state;
     switch (state) {
         case Connection::Connected:
             connectBtn->setText("Rozłącz");
@@ -137,7 +198,6 @@ void ConnectionPanel::setConnectionState(Connection::State state) {
             connectBtn->setEnabled(false);
             break;
     }
-    connectionState = state;
 }
 
 bool ConnectionPanel::isFrameMode() {

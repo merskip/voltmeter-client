@@ -1,8 +1,6 @@
 #include "IODeviceConnection.hpp"
 
-
-
-void IODeviceConnection::disconnect() {
+void IODeviceConnection::closeConnection() {
     device->close();
 }
 

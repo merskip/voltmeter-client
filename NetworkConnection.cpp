@@ -1,7 +1,7 @@
 #include <iostream>
 #include "NetworkConnection.hpp"
 
-void NetworkConnection::connect() {
+void NetworkConnection::createConnection() {
     socket = new QTcpSocket();
     device = socket;
 

@@ -84,9 +84,9 @@ void MainWindow::setConnection(Connection *connection) {
     this->connection->moveToThread(thread);
 
     connect(connectionPanel, SIGNAL(doConnect()),
-            connection, SLOT(connect()));
+            connection, SLOT(createConnection()));
     connect(connectionPanel, SIGNAL(doDisconnect()),
-            connection, SLOT(disconnect()));
+            connection, SLOT(closeConnection()));
 
     connect(connection, SIGNAL(stateChanged(Connection::State)),
             this, SLOT(connectionStateChanged(Connection::State)));

@@ -34,8 +34,8 @@ public:
     virtual QString toStringAddress() = 0;
 
 public slots:
-    virtual void connect() = 0;
-    virtual void disconnect() = 0;
+    virtual void createConnection() = 0;
+    virtual void closeConnection() = 0;
 
     virtual Measurement downloadOne() = 0;
     virtual Connection::Frame downloadFrame(int duration) = 0;
