@@ -131,6 +131,7 @@ void MainWindow::connectionStateChanged(Connection::State state) {
 
         plot->setTimeRange(timeRange / 1000);
         timer->start(timeInterval);
+        isSocketError = false;
     } else if (state == Connection::Disconnected) {
         timer->stop();
         plot->clearAllChannel();
