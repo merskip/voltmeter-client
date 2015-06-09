@@ -1,16 +1,7 @@
 #include <iostream>
 #include "NetworkConnection.hpp"
 
-void NetworkConnection::connect(Params params) {
-    if (params.size() < 2)
-        throw QString("Too few arguments");
-
-    bool ok;
-    serverHost = QString(params[0]);
-    serverPort = (quint16) params[1].toUInt(&ok);
-
-    if (!ok) throw QString("Invalid port");
-
+void NetworkConnection::connect() {
     socket = new QTcpSocket();
     device = socket;
 

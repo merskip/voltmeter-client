@@ -108,15 +108,15 @@ void ConnectionPanel::handleConnectBtn() {
 void ConnectionPanel::sendDoConnect() {
     Type type = typeSelect->currentData().value<Type>();
     if (type == Type::Network) {
-        emit connectionChanged(new NetworkConnection());
-
         QString host = network.hostEdit->text();
         quint16 port = (quint16) network.portEdit->value();
 
-        Connection::Params params;
-        params.append(host.toUtf8());
-        params.append(QString::number(port).toUtf8());
-        emit doConnect(params);
+        NetworkConnection *connection = new NetworkConnection();
+        connection->setServerHost(host);
+        connection->setServerPort(port);
+        emit connectionChanged(connection);
+
+        emit doConnect();
     } else {
         throw QString("Not implemented yet");
     }

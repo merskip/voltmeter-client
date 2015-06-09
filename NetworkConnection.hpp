@@ -17,7 +17,15 @@ protected:
 public:
     NetworkConnection() { }
 
-    virtual void connect(Params params);
+    void setServerHost(const QString &serverHost) {
+        this->serverHost = serverHost;
+    }
+
+    void setServerPort(quint16 serverPort) {
+        this->serverPort = serverPort;
+    }
+
+    virtual void connect();
 
     virtual QString toStringAddress();
 

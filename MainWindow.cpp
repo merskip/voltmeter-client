@@ -53,7 +53,6 @@ MainWindow::MainWindow() {
 
     // Wymagana rejestracja typów,
     // bez tego dalsze połączenia z Connection nie będą działać
-    qRegisterMetaType<Connection::Params>("Connection::Params");
     qRegisterMetaType<Connection::State>("Connection::State");
     qRegisterMetaType<Measurement>("Measurement&");
     qRegisterMetaType<Connection::Frame>("Connection::Frame&");
@@ -84,8 +83,8 @@ void MainWindow::setConnection(Connection *connection) {
     this->connection = connection;
     this->connection->moveToThread(thread);
 
-    connect(connectionPanel, SIGNAL(doConnect(Connection::Params)),
-            connection, SLOT(connect(Connection::Params)));
+    connect(connectionPanel, SIGNAL(doConnect()),
+            connection, SLOT(connect()));
     connect(connectionPanel, SIGNAL(doDisconnect()),
             connection, SLOT(disconnect()));
 

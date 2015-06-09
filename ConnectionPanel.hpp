@@ -65,7 +65,7 @@ public slots:
 signals:
     void connectionChanged(Connection *connection);
 
-    void doConnect(Connection::Params params);
+    void doConnect();
     void doDisconnect();
 
     void frameModeChanged(bool isFrameMode);

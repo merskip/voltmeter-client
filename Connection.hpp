@@ -9,7 +9,6 @@ class Connection : public QObject {
     Q_OBJECT
 
 public:
-    typedef QVector<QByteArray> Params;
     typedef QList<QVector<double>> Frame;
 
     enum State {
@@ -35,7 +34,7 @@ public:
     virtual QString toStringAddress() = 0;
 
 public slots:
-    virtual void connect(Connection::Params params) = 0;
+    virtual void connect() = 0;
     virtual void disconnect() = 0;
 
     virtual Measurement downloadOne() = 0;
