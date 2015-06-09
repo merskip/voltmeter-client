@@ -19,6 +19,7 @@ set(SOURCE_FILES
     IODeviceConnection.cpp
     NetworkConnection.cpp
     SerialPortConnection.cpp
+    EmulatorConnection.cpp
     ChannelPanel.cpp
     ConnectionPanel.cpp
     SidePanel.cpp

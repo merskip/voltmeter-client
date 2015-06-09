@@ -4,6 +4,7 @@
 #include "ConnectionPanel.hpp"
 #include "NetworkConnection.hpp"
 #include "SerialPortConnection.hpp"
+#include "EmulatorConnection.hpp"
 
 ConnectionPanel::ConnectionPanel() {
     typeSelect = new QComboBox();
@@ -60,6 +61,9 @@ void ConnectionPanel::setupParamsLayout(Type type) {
             break;
         case SerialPort:
             setupSerialLayout(contentLayout);
+            break;
+        case Emulator:
+            setupEmulatorLayout(contentLayout);
             break;
         default: break; // Nic, pusty layout
     }
@@ -134,6 +138,12 @@ void ConnectionPanel::setupSerialLayout(QHBoxLayout *layout) {
     layout->addWidget(connectBtn);
 }
 
+
+void ConnectionPanel::setupEmulatorLayout(QHBoxLayout *layout) {
+    layout->addWidget(new QLabel("tryb emulatora"));
+    layout->addWidget(connectBtn);
+}
+
 void ConnectionPanel::handleConnectBtn() {
     if (connectionState == Connection::Disconnected)
         sendDoConnect();
@@ -152,8 +162,9 @@ void ConnectionPanel::sendDoConnect() {
         case SerialPort:
             sendDoConnectSerialPort();
             break;
-        default:
-            throw QString("Not implemented yet");
+        case Emulator:
+            sendDoConnectEmulator();
+            break;
     }
 }
 
@@ -177,6 +188,14 @@ void ConnectionPanel::sendDoConnectSerialPort() {
     SerialPortConnection *connection = new SerialPortConnection();
     connection->setPortName(portName);
     connection->setBaudRate(baudRate);
+    emit connectionChanged(connection);
+
+    emit doConnect();
+}
+
+
+void ConnectionPanel::sendDoConnectEmulator() {
+    EmulatorConnection *connection = new EmulatorConnection();
     emit connectionChanged(connection);
 
     emit doConnect();

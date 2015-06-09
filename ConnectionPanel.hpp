@@ -60,12 +60,14 @@ private:
     void setupParamsLayout(Type type);
     void setupNetworkLayout(QHBoxLayout *layout);
     void setupSerialLayout(QHBoxLayout *layout);
+    void setupEmulatorLayout(QHBoxLayout *layout);
 
     void clearContentLayout();
 
     void sendDoConnect();
     void sendDoConnectNetwork();
     void sendDoConnectSerialPort();
+    void sendDoConnectEmulator();
 
 private slots:
     void handleTypeChanged(int index);
