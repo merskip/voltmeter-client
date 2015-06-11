@@ -49,12 +49,8 @@ private:
     Connection::State connectionState;
     QPushButton *connectBtn;
 
-    QCheckBox *frameModeCheck;
-
 public:
     ConnectionPanel();
-
-    bool isFrameMode();
 
 private:
     void setupParamsLayout(Type type);
@@ -73,7 +69,6 @@ private slots:
     void handleTypeChanged(int index);
 
     void handleConnectBtn();
-    void handleFrameModeStateChanged(int state);
 
 public slots:
     void setConnectionState(Connection::State state);
@@ -83,8 +78,6 @@ signals:
 
     void doConnect();
     void doDisconnect();
-
-    void frameModeChanged(bool isFrameMode);
 };
 
 Q_DECLARE_METATYPE(ConnectionPanel::Type);

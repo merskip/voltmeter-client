@@ -2,6 +2,7 @@
 
 #include <QWidget>
 #include <QTimeEdit>
+#include <QCheckBox>
 #include "ChannelPanel.hpp"
 
 class SidePanel : public QWidget {
@@ -9,6 +10,8 @@ class SidePanel : public QWidget {
 
 private:
     ChannelPanel *channelPanel[5];
+
+    QCheckBox *frameModeCheck;
     QTimeEdit *timeRangeEdit;
     QTimeEdit *timeIntervalEdit;
 
@@ -21,4 +24,10 @@ public:
 
     int getTimeRangeMillis();
     int getTimeIntervalMillis();
+
+private slots:
+    void handleFrameModeStateChanged(int state);
+
+signals:
+    void frameModeChanged(bool isFrameMode);
 };

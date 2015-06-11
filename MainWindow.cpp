@@ -16,7 +16,7 @@ MainWindow::MainWindow() {
     plot->setMinimumSize(300, 150);
     connectionPanel->layout()->setContentsMargins(0, 0, 0, 0);
     sidePanel->layout()->setContentsMargins(0, 0, 0, 0);
-    sidePanel->setFixedWidth(120);
+    sidePanel->setFixedWidth(150);
 
     QHBoxLayout *contentLayout = new QHBoxLayout();
     contentLayout->addWidget(plot);
@@ -62,10 +62,9 @@ MainWindow::MainWindow() {
 
     connect(plot, SIGNAL(isDone()), this, SLOT(plotIsDone()));
 
-    connect(connectionPanel, SIGNAL(frameModeChanged(bool)),
+    connect(sidePanel, SIGNAL(frameModeChanged(bool)),
             this, SLOT(frameModeChanged(bool)));
-
-    connect(connectionPanel, SIGNAL(frameModeChanged(bool)),
+    connect(sidePanel, SIGNAL(frameModeChanged(bool)),
             plot, SLOT(setFrameMode(bool)));
 
     timeRange = sidePanel->getTimeRangeMillis();
@@ -204,6 +203,6 @@ void MainWindow::frameModeChanged(bool isFrameMode) {
         timer->setInterval(timeInterval);
     }
 
-    if (connection->isConnected())
+    if (connection != nullptr && connection->isConnected())
         timer->start();
 }

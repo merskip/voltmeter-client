@@ -15,16 +15,12 @@ ConnectionPanel::ConnectionPanel() {
 
     connectBtn = new QPushButton();
 
-    frameModeCheck = new QCheckBox("Tryb frame:");
-    frameModeCheck->setLayoutDirection(Qt::RightToLeft);
-
     contentLayout = new QHBoxLayout();
     mainLayout = new QHBoxLayout();
     mainLayout->setAlignment(Qt::AlignLeft);
     mainLayout->addWidget(typeSelect);
     mainLayout->addLayout(contentLayout);
     mainLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
-    mainLayout->addWidget(frameModeCheck);
     setLayout(mainLayout);
 
     setupParamsLayout(Type::Network);
@@ -32,9 +28,6 @@ ConnectionPanel::ConnectionPanel() {
 
     connect(connectBtn, SIGNAL(clicked()),
             this, SLOT(handleConnectBtn()));
-
-    connect(frameModeCheck, SIGNAL(stateChanged(int)),
-            this, SLOT(handleFrameModeStateChanged(int)));
 
     connect(typeSelect, SIGNAL(currentIndexChanged(int)),
             this, SLOT(handleTypeChanged(int)));
@@ -218,12 +211,3 @@ void ConnectionPanel::setConnectionState(Connection::State state) {
             break;
     }
 }
-
-bool ConnectionPanel::isFrameMode() {
-    return frameModeCheck->isChecked();
-}
-
-void ConnectionPanel::handleFrameModeStateChanged(int state) {
-    emit frameModeChanged((bool) state);
-}
-

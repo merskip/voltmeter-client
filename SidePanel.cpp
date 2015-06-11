@@ -8,6 +8,8 @@ SidePanel::SidePanel() {
     channelPanel[3] = new ChannelPanel(3, "Kanał 3");
     channelPanel[4] = new ChannelPanel(4, "Kanał 4");
 
+    frameModeCheck = new QCheckBox("Tryb frame");
+
     timeRangeEdit = new QTimeEdit();
     timeRangeEdit->setDisplayFormat("HH:mm:ss.zzz");
     timeRangeEdit->setCurrentSectionIndex(2);
@@ -27,15 +29,23 @@ SidePanel::SidePanel() {
     layout->addWidget(channelPanel[3]);
     layout->addWidget(channelPanel[4]);
     layout->addSpacerItem(new QSpacerItem(0,0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+    layout->addWidget(frameModeCheck);
     layout->addWidget(new QLabel("Zakres czasu:"));
     layout->addWidget(timeRangeEdit);
     layout->addWidget(new QLabel("Odświerzanie:"));
     layout->addWidget(timeIntervalEdit);
     setLayout(layout);
+
+    connect(frameModeCheck, SIGNAL(stateChanged(int)),
+            this, SLOT(handleFrameModeStateChanged(int)));
 }
 
 ChannelPanel *SidePanel::getChannelPanel(int channel) {
     return channelPanel[channel];
+}
+
+void SidePanel::handleFrameModeStateChanged(int state) {
+    emit frameModeChanged((bool) state);
 }
 
 QTimeEdit *SidePanel::getTimeRangeEdit() {
