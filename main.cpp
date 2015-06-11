@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
 
     MainWindow window;
     window.setGeometry(0, 0, 720, 480);
-    window.show();
+    window.showMaximized();
 
     return app.exec();
 }
