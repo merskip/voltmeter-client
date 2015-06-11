@@ -14,6 +14,11 @@ void NetworkConnection::createConnection() {
     socket->connectToHost(serverHost, serverPort);
 }
 
+void NetworkConnection::closeConnection() {
+    if (socket->isOpen())
+        socket->close();
+}
+
 QString NetworkConnection::toStringAddress() {
     QString addr;
     addr += serverHost;
@@ -97,17 +102,13 @@ Connection::Frame NetworkConnection::downloadFrame(int duration) {
 void NetworkConnection::socketStateChanged(QAbstractSocket::SocketState socketState) {
     switch (socketState) {
         case QAbstractSocket::ConnectedState:
-            this->state = Connection::State::Connected;
-            emit Connection::stateChanged(this->state);
-            emit connected();
+            setConnectionState(Connected);
             break;
         case QAbstractSocket::UnconnectedState:
-            this->state = Connection::State::Disconnected;
-            emit Connection::stateChanged(this->state);
+            setConnectionState(Disconnected);
             break;
         case QAbstractSocket::ConnectingState:
-            this->state = Connection::State::Connecting;
-            emit Connection::stateChanged(this->state);
+            setConnectionState(Connecting);
             break;
         default: break; // Ignorowanie reszty stanów
     }

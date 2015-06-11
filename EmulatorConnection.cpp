@@ -6,15 +6,12 @@
 #include "EmulatorConnection.hpp"
 
 void EmulatorConnection::createConnection() {
-    emit stateChanged(Connecting);
-    emit stateChanged(Connected);
-    emit connected();
-    this->state = Connected;
+    setConnectionState(Connecting);
+    setConnectionState(Connected);
 }
 
 void EmulatorConnection::closeConnection() {
-    emit stateChanged(Disconnected);
-    this->state = Disconnected;
+    setConnectionState(Disconnected);
 }
 
 QString EmulatorConnection::toStringAddress() {

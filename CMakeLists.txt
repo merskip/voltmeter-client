@@ -14,7 +14,6 @@ add_definitions(-std=c++11)
 set(SOURCE_FILES
     main.cpp
     lib/qcustomplot.cpp
-    Measurement.hpp
     Connection.cpp
     IODeviceConnection.cpp
     NetworkConnection.cpp

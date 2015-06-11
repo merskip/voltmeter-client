@@ -18,7 +18,4 @@ protected:
 
     QByteArray readOneLine();
 
-public slots:
-    virtual void closeConnection();
-
 };

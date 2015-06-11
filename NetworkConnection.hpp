@@ -29,6 +29,7 @@ public:
 
 public slots:
     virtual void createConnection();
+    virtual void closeConnection();
 
     virtual Measurement downloadOne();
     virtual Frame downloadFrame(int duration);

@@ -3,7 +3,7 @@
 #include "SerialPortConnection.hpp"
 
 void SerialPortConnection::createConnection() {
-    emit stateChanged(Connecting);
+    setConnectionState(Connecting);
 
     serial = new QSerialPort();
     device = serial;
@@ -14,17 +14,17 @@ void SerialPortConnection::createConnection() {
     QObject::connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(serialError(QSerialPort::SerialPortError)));
 
-    if (serial->open(QIODevice::ReadWrite)) {
-        emit stateChanged(Connected);
-        emit connected();
-    } else {
-        emit stateChanged(Disconnected);
-    }
+    if (serial->open(QIODevice::ReadWrite))
+        setConnectionState(Connected);
+    else
+        setConnectionState(Disconnected);
 }
 
 void SerialPortConnection::closeConnection() {
-    IODeviceConnection::closeConnection();
-    emit stateChanged(Disconnected);
+    if (serial->isOpen())
+        serial->close();
+
+    setConnectionState(Disconnected);
 }
 
 QString SerialPortConnection::toStringAddress() {

@@ -4,7 +4,6 @@
 #include <QtNetwork/QTcpSocket>
 #include <QtNetwork/QHostAddress>
 #include "lib/qcustomplot.h"
-#include "Measurement.hpp"
 #include "Connection.hpp"
 
 class GaugePlot : public QCustomPlot {

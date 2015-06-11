@@ -1,9 +1,5 @@
 #include "IODeviceConnection.hpp"
 
-void IODeviceConnection::closeConnection() {
-    device->close();
-}
-
 QByteArray IODeviceConnection::readOneLine() {
     QByteArray line, fragment;
 

@@ -3,7 +3,14 @@
 #include <QObject>
 #include <QVector>
 #include <QByteArray>
-#include "Measurement.hpp"
+
+struct Measurement {
+    double time;
+    struct {
+        int value;
+        double voltage;
+    } channel[5];
+};
 
 class Connection : public QObject {
     Q_OBJECT
@@ -20,15 +27,24 @@ public:
 protected:
     int valueMax = 255;
     double voltageMax = 5.1;
+
+private:
     State state = Disconnected;
 
 public:
-    inline bool isConnected() {
-        return state == Connected;
+    virtual bool isConnected() {
+        return getConnectionState() == Connected;
     }
 
-    inline State getState() {
+    inline State getConnectionState() {
         return state;
+    }
+
+    inline void setConnectionState(State state) {
+        this->state = state;
+        emit stateChanged(this->state);
+        if (state == Connected)
+            emit connected();
     }
 
     virtual QString toStringAddress() = 0;
