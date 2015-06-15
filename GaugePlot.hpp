@@ -19,6 +19,10 @@ private:
 public:
     GaugePlot();
 
+    inline void setTimeRangeMillis(int time) {
+        setTimeRange((double) time / 1000);
+    }
+
     void setVoltageRange(double min, double max);
     void setTimeRange(double time);
 

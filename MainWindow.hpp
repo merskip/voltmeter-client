@@ -24,8 +24,7 @@ private:
     ChannelPanel *channelPanel[5];
     SidePanel *sidePanel;
 
-    int timeRange;
-    int timeInterval;
+    int timeFrame;
 
 public:
     MainWindow();
@@ -49,10 +48,11 @@ private slots:
     void connectionStateChanged(Connection::State state);
     void connectionErrorOccurred(QString error);
 
-    void timeRangeChanged(QTime time);
-    void timeIntervalChanged(QTime time);
-
     void frameModeChanged(bool isFrameMode);
+
+    void timeRangeChanged(int timeRange);
+    void timeIntervalChanged(int timeInterval);
+    void timeFrameChanged(int timeFrame);
 
     void voltageChanged(Measurement &data);
 

@@ -46,10 +46,15 @@ MainWindow::MainWindow() {
     channelPanel[3]->setChannelVisible(false);
     channelPanel[4]->setChannelVisible(false);
 
-    connect(sidePanel->getTimeRangeEdit(), SIGNAL(timeChanged(QTime)),
-            this, SLOT(timeRangeChanged(QTime)));
-    connect(sidePanel->getTimeIntervalEdit(), SIGNAL(timeChanged(QTime)),
-            this, SLOT(timeIntervalChanged(QTime)));
+    connect(sidePanel, SIGNAL(frameModeChanged(bool)),
+            this, SLOT(frameModeChanged(bool)));
+
+    connect(sidePanel, SIGNAL(timeRangeChanged(int)),
+            this, SLOT(timeRangeChanged(int)));
+    connect(sidePanel, SIGNAL(timeIntervalChanged(int)),
+            this, SLOT(timeIntervalChanged(int)));
+    connect(sidePanel, SIGNAL(timeFrameChanged(int)),
+            this, SLOT(timeFrameChanged(int)));
 
     // Wymagana rejestracja typów,
     // bez tego dalsze połączenia z Connection nie będą działać
@@ -61,14 +66,6 @@ MainWindow::MainWindow() {
             this, SLOT(setConnection(Connection*)));
 
     connect(plot, SIGNAL(isDone()), this, SLOT(plotIsDone()));
-
-    connect(sidePanel, SIGNAL(frameModeChanged(bool)),
-            this, SLOT(frameModeChanged(bool)));
-    connect(sidePanel, SIGNAL(frameModeChanged(bool)),
-            plot, SLOT(setFrameMode(bool)));
-
-    timeRange = sidePanel->getTimeRangeMillis();
-    timeInterval = sidePanel->getTimeIntervalMillis();
 
     setNullVoltage();
     statusBar()->show();
@@ -120,7 +117,7 @@ void MainWindow::timerTick() {
     if (!isBusy) {
         isBusy = true;
         if (isFrameMode) {
-            emit doDownloadFrame(timeInterval);
+            emit doDownloadFrame(timeFrame);
         } else {
             emit doDownloadOne();
         }
@@ -134,9 +131,21 @@ void MainWindow::plotIsDone() {
 }
 
 void MainWindow::doStart() {
+    if (isFrameMode) {
+        this->timeFrame = sidePanel->getTimeFrame();
+        timer->setSingleShot(true);
+        timer->setInterval(0);
+        setNullVoltage();
+    } else {
+        int timeRange = sidePanel->getTimeRange();
+        int timeInterval = sidePanel->getTimeInterval();
+        plot->setTimeRangeMillis(timeRange);
+        timer->setSingleShot(false);
+        timer->setInterval(timeInterval);
+    }
+
     isBusy = false;
-    plot->setTimeRange(timeRange / 1000);
-    timer->start(timeInterval);
+    timer->start();
 }
 
 void MainWindow::connectionStateChanged(Connection::State state) {
@@ -145,8 +154,6 @@ void MainWindow::connectionStateChanged(Connection::State state) {
         QString address = connection->toStringAddress();
         statusBar()->showMessage("Połączono z " + address);
 
-        plot->setTimeRange(timeRange / 1000);
-        timer->start(timeInterval);
         isSocketError = false;
     } else if (state == Connection::Disconnected) {
         timer->stop();
@@ -181,28 +188,25 @@ void MainWindow::setNullVoltage() {
     channelPanel[4]->setNullVoltage();
 }
 
-void MainWindow::timeRangeChanged(QTime time) {
-    int millis = time.msecsSinceStartOfDay();
-    plot->setTimeRange((double) millis / 1000);
-    timeRange = millis;
-}
-
-void MainWindow::timeIntervalChanged(QTime time) {
-    int millis = time.msecsSinceStartOfDay();
-    timer->setInterval(millis);
-    timeInterval = millis;
-}
-
 void MainWindow::frameModeChanged(bool isFrameMode) {
     this->isFrameMode = isFrameMode;
-
-    if (isFrameMode) {
-        timer->setSingleShot(true);
-    } else {
-        timer->setSingleShot(false);
-        timer->setInterval(timeInterval);
-    }
+    plot->setFrameMode(isFrameMode);
 
     if (connection != nullptr && connection->isConnected())
-        timer->start();
+        doStart();
+}
+
+
+void MainWindow::timeRangeChanged(int timeRange) {
+    if (!isFrameMode)
+        plot->setTimeRangeMillis(timeRange);
+}
+
+void MainWindow::timeIntervalChanged(int timeInterval) {
+    if (!isFrameMode)
+        timer->setInterval(timeInterval);
+}
+
+void MainWindow::timeFrameChanged(int timeFrame) {
+    this->timeFrame = timeFrame;
 }
