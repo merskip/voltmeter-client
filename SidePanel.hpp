@@ -4,6 +4,7 @@
 #include <QTimeEdit>
 #include <QCheckBox>
 #include <QStackedWidget>
+#include <QVBoxLayout>
 #include "ChannelPanel.hpp"
 #include "ShowMode.hpp"
 
@@ -58,8 +59,6 @@ private slots:
 
 signals:
     void showModeChanged(ShowMode mode);
-
-    _GLIBCXX_DEPRECATED void frameModeChanged(bool isFrameMode);
 
     void timeRangeChanged(int timeRange);
     void timeIntervalChanged(int timeInterval);
