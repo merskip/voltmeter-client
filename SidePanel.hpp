@@ -5,6 +5,7 @@
 #include <QCheckBox>
 #include <QStackedWidget>
 #include "ChannelPanel.hpp"
+#include "ShowMode.hpp"
 
 class SidePanel : public QWidget {
     Q_OBJECT
@@ -13,9 +14,9 @@ private:
     ChannelPanel *channelPanel[5];
 
     QStackedWidget *stackedPanel;
-    QVBoxLayout *normalLayout;
+    QVBoxLayout *realTimeLayout;
     QVBoxLayout *frameLayout;
-    QWidget *normalPage;
+    QWidget *realTimePage;
     QWidget *framePage;
 
     QCheckBox *frameModeCheck;
@@ -29,7 +30,8 @@ public:
 
     ChannelPanel *getChannelPanel(int channel);
 
-    void setFrameMode(bool enabled);
+    ShowMode getShowMode();
+    void setShowMode(ShowMode mode);
 
     int getTimeRange() {
         return timeRangeEdit->time().msecsSinceStartOfDay();
@@ -43,6 +45,10 @@ public:
         return timeFrameEdit->time().msecsSinceStartOfDay();
     }
 
+private:
+    void setupRealTimeMode();
+    void setupFrameMode();
+
 private slots:
     void handleFrameModeStateChanged(int state);
 
@@ -51,7 +57,9 @@ private slots:
     void handleTimeFrameEdit(QTime time);
 
 signals:
-    void frameModeChanged(bool isFrameMode);
+    void showModeChanged(ShowMode mode);
+
+    _GLIBCXX_DEPRECATED void frameModeChanged(bool isFrameMode);
 
     void timeRangeChanged(int timeRange);
     void timeIntervalChanged(int timeInterval);

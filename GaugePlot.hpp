@@ -5,6 +5,7 @@
 #include <QtNetwork/QHostAddress>
 #include "lib/qcustomplot.h"
 #include "Connection.hpp"
+#include "ShowMode.hpp"
 
 class GaugePlot : public QCustomPlot {
     Q_OBJECT
@@ -37,13 +38,16 @@ public:
     void clearAllChannel();
 
 public slots:
-    void setFrameMode(bool state);
+    void setShowMode(ShowMode mode);
     void setChannelVisible(int channel, bool on);
     void appendMeasurement(Measurement &data);
 
     void showFrame(Connection::Frame &frame);
 
 private:
+    void setupRealTimeMode();
+    void setupFrameMode();
+
     void setupGraphChannel(int channel, QColor color);
     void updateGraphChannel(int channel, double time, double voltage);
 

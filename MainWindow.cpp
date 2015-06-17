@@ -46,8 +46,8 @@ MainWindow::MainWindow() {
     channelPanel[3]->setChannelVisible(false);
     channelPanel[4]->setChannelVisible(false);
 
-    connect(sidePanel, SIGNAL(frameModeChanged(bool)),
-            this, SLOT(frameModeChanged(bool)));
+    connect(sidePanel, SIGNAL(showModeChanged(ShowMode)),
+            this, SLOT(showModeChanged(ShowMode)));
 
     connect(sidePanel, SIGNAL(timeRangeChanged(int)),
             this, SLOT(timeRangeChanged(int)));
@@ -109,14 +109,10 @@ void MainWindow::setConnection(Connection *connection) {
             plot, SLOT(showFrame(Connection::Frame&)));
 }
 
-Connection *MainWindow::getConnection() {
-    return connection;
-}
-
 void MainWindow::timerTick() {
     if (!isBusy) {
         isBusy = true;
-        if (isFrameMode) {
+        if (isFrameMode()) {
             emit doDownloadFrame(timeFrame);
         } else {
             emit doDownloadOne();
@@ -126,25 +122,32 @@ void MainWindow::timerTick() {
 
 void MainWindow::plotIsDone() {
     isBusy = false;
-    if (isFrameMode)
+    if (isFrameMode())
         timer->start(0);
 }
 
 void MainWindow::doStart() {
-    if (isFrameMode) {
-        this->timeFrame = sidePanel->getTimeFrame();
-        timer->setSingleShot(true);
-        timer->setInterval(0);
-        setNullVoltage();
-    } else {
-        int timeRange = sidePanel->getTimeRange();
-        int timeInterval = sidePanel->getTimeInterval();
-        plot->setTimeRangeMillis(timeRange);
-        timer->setSingleShot(false);
-        timer->setInterval(timeInterval);
-    }
-
     isBusy = false;
+    if (isRealTimeMode())
+        startRealTimeMode();
+    else
+        startFrameMode();
+}
+
+void MainWindow::startRealTimeMode() {
+    int timeRange = sidePanel->getTimeRange();
+    int timeInterval = sidePanel->getTimeInterval();
+    plot->setTimeRangeMillis(timeRange);
+    timer->setSingleShot(false);
+    timer->setInterval(timeInterval);
+    timer->start();
+}
+
+void MainWindow::startFrameMode() {
+    this->timeFrame = sidePanel->getTimeFrame();
+    setNullVoltage();
+    timer->setSingleShot(true);
+    timer->setInterval(0);
     timer->start();
 }
 
@@ -188,25 +191,42 @@ void MainWindow::setNullVoltage() {
     channelPanel[4]->setNullVoltage();
 }
 
-void MainWindow::frameModeChanged(bool isFrameMode) {
-    this->isFrameMode = isFrameMode;
-    plot->setFrameMode(isFrameMode);
+void MainWindow::showModeChanged(ShowMode mode) {
+    this->showMode = mode;
+    plot->setShowMode(mode);
 
-    if (connection != nullptr && connection->isConnected())
+    if (isConnected())
         doStart();
 }
 
-
 void MainWindow::timeRangeChanged(int timeRange) {
-    if (!isFrameMode)
+    if (isRealTimeMode())
         plot->setTimeRangeMillis(timeRange);
 }
 
 void MainWindow::timeIntervalChanged(int timeInterval) {
-    if (!isFrameMode)
+    if (isRealTimeMode())
         timer->setInterval(timeInterval);
 }
 
 void MainWindow::timeFrameChanged(int timeFrame) {
     this->timeFrame = timeFrame;
+}
+
+bool MainWindow::isRealTimeMode() {
+    return showMode == RealTimeMode;
+}
+
+bool MainWindow::isFrameMode() {
+    return showMode == FrameMode;
+}
+
+bool MainWindow::isConnected() {
+    if (this->connection == nullptr)
+        return false;
+    return this->connection->isConnected();
+}
+
+Connection *MainWindow::getConnection() {
+    return connection;
 }

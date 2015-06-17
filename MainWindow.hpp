@@ -12,7 +12,6 @@ class MainWindow : public QMainWindow {
 
 private:
     bool isBusy = false;
-    bool isFrameMode = false;
     bool isSocketError = false;
 
     Connection *connection;
@@ -24,11 +23,17 @@ private:
     ChannelPanel *channelPanel[5];
     SidePanel *sidePanel;
 
+    ShowMode showMode = RealTimeMode;
     int timeFrame;
 
 public:
     MainWindow();
 
+    bool isRealTimeMode();
+    bool isFrameMode();
+
+
+    bool isConnected();
     Connection *getConnection();
 
 public slots:
@@ -48,7 +53,7 @@ private slots:
     void connectionStateChanged(Connection::State state);
     void connectionErrorOccurred(QString error);
 
-    void frameModeChanged(bool isFrameMode);
+    void showModeChanged(ShowMode mode);
 
     void timeRangeChanged(int timeRange);
     void timeIntervalChanged(int timeInterval);
@@ -57,5 +62,8 @@ private slots:
     void voltageChanged(Measurement &data);
 
 private:
+    void startRealTimeMode();
+    void startFrameMode();
+
     void setNullVoltage();
 };

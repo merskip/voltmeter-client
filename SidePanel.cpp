@@ -26,16 +26,16 @@ SidePanel::SidePanel() {
     timeFrameEdit->setMinimumTime(QTime(0, 0, 0, 1));
     timeFrameEdit->setTime(QTime(0, 0, 0, 100));
 
-    normalLayout = new QVBoxLayout();
-    normalLayout->addStretch(1);
-    normalLayout->addWidget(new QLabel("Zakres czasu:"));
-    normalLayout->addWidget(timeRangeEdit);
-    normalLayout->addWidget(new QLabel("Odświerzanie:"));
-    normalLayout->addWidget(timeIntervalEdit);
-    normalLayout->setContentsMargins(0, 0, 0, 0);
+    realTimeLayout = new QVBoxLayout();
+    realTimeLayout->addStretch(1);
+    realTimeLayout->addWidget(new QLabel("Zakres czasu:"));
+    realTimeLayout->addWidget(timeRangeEdit);
+    realTimeLayout->addWidget(new QLabel("Odświerzanie:"));
+    realTimeLayout->addWidget(timeIntervalEdit);
+    realTimeLayout->setContentsMargins(0, 0, 0, 0);
 
-    normalPage = new QWidget();
-    normalPage->setLayout(normalLayout);
+    realTimePage = new QWidget();
+    realTimePage->setLayout(realTimeLayout);
 
     frameLayout = new QVBoxLayout();
     frameLayout->addStretch(1);
@@ -47,7 +47,7 @@ SidePanel::SidePanel() {
     framePage->setLayout(frameLayout);
 
     stackedPanel = new QStackedWidget();
-    stackedPanel->addWidget(normalPage);
+    stackedPanel->addWidget(realTimePage);
     stackedPanel->addWidget(framePage);
     stackedPanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
@@ -71,7 +71,7 @@ SidePanel::SidePanel() {
     connect(timeFrameEdit, SIGNAL(timeChanged(QTime)),
             this, SLOT(handleTimeFrameEdit(QTime)));
 
-    setFrameMode(false);
+    setShowMode(RealTimeMode);
 }
 
 ChannelPanel *SidePanel::getChannelPanel(int channel) {
@@ -79,23 +79,37 @@ ChannelPanel *SidePanel::getChannelPanel(int channel) {
 }
 
 void SidePanel::handleFrameModeStateChanged(int state) {
-    setFrameMode((bool) state);
+    ShowMode mode = state == 0 ? RealTimeMode : FrameMode;
+    setShowMode(mode);
+    emit showModeChanged(mode);
+}
+
+ShowMode SidePanel::getShowMode() {
+    return frameModeCheck->isChecked() ? FrameMode : RealTimeMode;
+}
+
+void SidePanel::setShowMode(ShowMode mode) {
+    if (mode == RealTimeMode)
+        setupRealTimeMode();
+    else
+        setupFrameMode();
+}
+
+void SidePanel::setupRealTimeMode() {
+    stackedPanel->setCurrentWidget(realTimePage);
+
+    realTimeLayout->insertWidget(1, frameModeCheck);
+    timeRangeEdit->setCurrentSectionIndex(2);
+    timeIntervalEdit->setCurrentSectionIndex(3);
     frameModeCheck->setFocus();
 }
 
-void SidePanel::setFrameMode(bool enabled) {
-    stackedPanel->setCurrentWidget(enabled ? framePage : normalPage);
+void SidePanel::setupFrameMode() {
+    stackedPanel->setCurrentWidget(framePage);
 
-    if (enabled) {
-        frameLayout->insertWidget(1, frameModeCheck);
-        timeFrameEdit->setCurrentSectionIndex(3);
-    } else {
-        normalLayout->insertWidget(1, frameModeCheck);
-        timeRangeEdit->setCurrentSectionIndex(2);
-        timeIntervalEdit->setCurrentSectionIndex(3);
-    }
-
-    emit frameModeChanged(enabled);
+    frameLayout->insertWidget(1, frameModeCheck);
+    timeFrameEdit->setCurrentSectionIndex(3);
+    frameModeCheck->setFocus();
 }
 
 void SidePanel::handleTimeRangeEdit(QTime time) {

@@ -70,16 +70,23 @@ QColor GaugePlot::getChannelColor(int channel) {
 }
 
 
-void GaugePlot::setFrameMode(bool state) {
-    if (state) {
-        clearAllChannel();
-        xAxis->setTickLabelType(QCPAxis::LabelType::ltNumber);
-        xAxis->setTicks(false);
-    } else {
-        setTimeRange(timeRange);
-        xAxis->setTickLabelType(QCPAxis::LabelType::ltDateTime);
-        xAxis->setTicks(true);
-    }
+void GaugePlot::setShowMode(ShowMode mode) {
+    if (mode == RealTimeMode)
+        setupRealTimeMode();
+    else
+        setupFrameMode();
+}
+
+void GaugePlot::setupRealTimeMode() {
+    setTimeRange(timeRange);
+    xAxis->setTickLabelType(QCPAxis::LabelType::ltDateTime);
+    xAxis->setTicks(true);
+}
+
+void GaugePlot::setupFrameMode() {
+    clearAllChannel();
+    xAxis->setTickLabelType(QCPAxis::LabelType::ltNumber);
+    xAxis->setTicks(false);
 }
 
 void GaugePlot::clearAllChannel() {
