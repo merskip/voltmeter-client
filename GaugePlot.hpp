@@ -6,6 +6,7 @@
 #include "lib/qcustomplot.h"
 #include "Connection.hpp"
 #include "ShowMode.hpp"
+#include "TriggerOptions.hpp"
 
 class GaugePlot : public QCustomPlot {
     Q_OBJECT
@@ -15,7 +16,7 @@ private:
     QCPGraph *dot[5];
 
     double timeRange;
-    double triggerVoltage;
+    TriggerOptions triggerOptions;
 
 public:
     GaugePlot();
@@ -31,14 +32,13 @@ public:
         return timeRange;
     }
 
-    void setTriggerVoltage(double voltage);
-
     QColor getChannelColor(int channel);
 
     void clearAllChannel();
 
 public slots:
     void setShowMode(ShowMode mode);
+    void setTriggerOptions(TriggerOptions options);
     void setChannelVisible(int channel, bool on);
     void appendMeasurement(Measurement &data);
 
@@ -51,7 +51,9 @@ private:
     void setupGraphChannel(int channel, QColor color);
     void updateGraphChannel(int channel, double time, double voltage);
 
-    static int getShiftForTrigger(int channel, double voltage, QList<QVector<double>> &data);
+    void moveGraphForTrigger(Connection::Frame &data);
+    void moveGraph(int shift, int margin = 0);
+    static int getShiftForTrigger(int channel, double voltage, Connection::Frame &data);
     static bool belongsTo(double value, double a, double b);
 
 signals:

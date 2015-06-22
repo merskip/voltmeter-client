@@ -56,6 +56,9 @@ MainWindow::MainWindow() {
     connect(sidePanel, SIGNAL(timeFrameChanged(int)),
             this, SLOT(timeFrameChanged(int)));
 
+    connect(sidePanel, SIGNAL(triggerOptionsChanged(TriggerOptions)),
+            plot, SLOT(setTriggerOptions(TriggerOptions)));
+
     // Wymagana rejestracja typów,
     // bez tego dalsze połączenia z Connection nie będą działać
     qRegisterMetaType<Connection::State>("Connection::State");

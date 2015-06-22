@@ -1,4 +1,6 @@
 #include <QVBoxLayout>
+#include <QSpinBox>
+#include <QComboBox>
 #include "SidePanel.hpp"
 
 SidePanel::SidePanel() {
@@ -20,6 +22,9 @@ SidePanel::SidePanel() {
     timeIntervalEdit->setMinimumTime(QTime(0, 0, 0, 1));
     timeIntervalEdit->setTime(QTime(0, 0, 0, 10));
 
+    triggerOptionsDialog = new TriggerOptionsDialog();
+    triggerOptionsBtn = new QPushButton("Ustawienia");
+
     timeFrameEdit = new QTimeEdit();
     timeFrameEdit->setDisplayFormat("HH:mm:ss.zzz");
     timeFrameEdit->setCurrentSectionIndex(3);
@@ -39,6 +44,7 @@ SidePanel::SidePanel() {
 
     frameLayout = new QVBoxLayout();
     frameLayout->addStretch(1);
+    frameLayout->addWidget(triggerOptionsBtn);
     frameLayout->addWidget(new QLabel("Czas klatki:"));
     frameLayout->addWidget(timeFrameEdit);
     frameLayout->setContentsMargins(0, 0, 0, 0);
@@ -70,6 +76,12 @@ SidePanel::SidePanel() {
             this, SLOT(handleTimeIntervalEdit(QTime)));
     connect(timeFrameEdit, SIGNAL(timeChanged(QTime)),
             this, SLOT(handleTimeFrameEdit(QTime)));
+
+    connect(triggerOptionsBtn, SIGNAL(clicked()),
+            this, SLOT(handleTriggerSettings()));
+
+    connect(triggerOptionsDialog, SIGNAL(optionsChanged(TriggerOptions)),
+            this, SLOT(handleTriggerOptionsChanged(TriggerOptions)));
 
     setShowMode(RealTimeMode);
 }
@@ -112,6 +124,11 @@ void SidePanel::setupFrameMode() {
     frameModeCheck->setFocus();
 }
 
+void SidePanel::handleTriggerSettings() {
+    triggerOptionsDialog->show();
+    triggerOptionsDialog->activateWindow();
+}
+
 void SidePanel::handleTimeRangeEdit(QTime time) {
     int millis = time.msecsSinceStartOfDay();
     emit timeRangeChanged(millis);
@@ -125,4 +142,8 @@ void SidePanel::handleTimeIntervalEdit(QTime time) {
 void SidePanel::handleTimeFrameEdit(QTime time) {
     int millis = time.msecsSinceStartOfDay();
     emit timeFrameChanged(millis);
+}
+
+void SidePanel::handleTriggerOptionsChanged(TriggerOptions options) {
+    emit triggerOptionsChanged(options);
 }

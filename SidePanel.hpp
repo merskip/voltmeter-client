@@ -5,8 +5,10 @@
 #include <QCheckBox>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <QDialog>
 #include "ChannelPanel.hpp"
 #include "ShowMode.hpp"
+#include "TriggerOptionsDialog.hpp"
 
 class SidePanel : public QWidget {
     Q_OBJECT
@@ -25,6 +27,9 @@ private:
     QTimeEdit *timeRangeEdit;
     QTimeEdit *timeIntervalEdit;
     QTimeEdit *timeFrameEdit;
+
+    TriggerOptionsDialog *triggerOptionsDialog;
+    QPushButton *triggerOptionsBtn;
 
 public:
     SidePanel();
@@ -53,9 +58,13 @@ private:
 private slots:
     void handleFrameModeStateChanged(int state);
 
+    void handleTriggerSettings();
+
     void handleTimeRangeEdit(QTime time);
     void handleTimeIntervalEdit(QTime time);
     void handleTimeFrameEdit(QTime time);
+
+    void handleTriggerOptionsChanged(TriggerOptions options);
 
 signals:
     void showModeChanged(ShowMode mode);
@@ -63,4 +72,6 @@ signals:
     void timeRangeChanged(int timeRange);
     void timeIntervalChanged(int timeInterval);
     void timeFrameChanged(int timeFrame);
+
+    void triggerOptionsChanged(TriggerOptions options);
 };

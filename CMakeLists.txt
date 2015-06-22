@@ -22,8 +22,11 @@ set(SOURCE_FILES
     ChannelPanel.cpp
     ConnectionPanel.cpp
     SidePanel.cpp
+    TriggerOptionsDialog.cpp
     GaugePlot.cpp
-    MainWindow.cpp)
+    MainWindow.cpp
+    ShowMode.hpp
+    TriggerOptions.hpp)
 add_executable(voltmeter ${SOURCE_FILES})
 
 target_link_libraries(voltmeter Qt5::Widgets Qt5::PrintSupport Qt5::Network Qt5::SerialPort)

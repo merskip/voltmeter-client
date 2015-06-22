@@ -33,7 +33,7 @@ GaugePlot::GaugePlot() : QCustomPlot() {
 
     setVoltageRange(-0.2, 5.3);
     setTimeRange(8.0);
-    setTriggerVoltage(2.7);
+    setTriggerOptions(DEFAULT_TRIGGER_OPTIONS);
 }
 
 
@@ -98,8 +98,8 @@ void GaugePlot::clearAllChannel() {
     replot();
 }
 
-void GaugePlot::setTriggerVoltage(double voltage) {
-    triggerVoltage = voltage;
+void GaugePlot::setTriggerOptions(TriggerOptions options) {
+    this->triggerOptions = options;
 }
 
 void GaugePlot::appendMeasurement(Measurement &data) {
@@ -135,16 +135,34 @@ void GaugePlot::showFrame(Connection::Frame &data) {
         graph[3]->addData(i, item.at(3));
         graph[4]->addData(i, item.at(4));
     }
+    xAxis->setRange(0, dataSize);
 
-    int shift = getShiftForTrigger(1, triggerVoltage, data);
-    xAxis->setRange(0 + shift + (dataSize / 5), dataSize - 1 + shift - (dataSize / 5));
+    if (triggerOptions.isActive)
+        moveGraphForTrigger(data);
 
     replot();
     emit isDone();
 }
 
+void GaugePlot::moveGraphForTrigger(Connection::Frame &data) {
+    int channel = triggerOptions.channel;
+    int dataSize = graph[channel]->data()->size();
+    int shift = getShiftForTrigger(channel, triggerOptions.voltage, data);
 
-int GaugePlot::getShiftForTrigger(int channel, double voltage, QList<QVector<double>> &data) {
+    moveGraph(shift, dataSize / 5);
+}
+
+void GaugePlot::moveGraph(int shift, int margin) {
+    double lower = xAxis->range().lower;
+    double upper = xAxis->range().upper;
+
+    lower += shift + margin;
+    upper += shift - margin;
+
+    xAxis->setRange(lower, upper);
+}
+
+int GaugePlot::getShiftForTrigger(int channel, double voltage, Connection::Frame &data) {
 
     int dataSize = data.size();
     int sizeHalf = dataSize / 2;
