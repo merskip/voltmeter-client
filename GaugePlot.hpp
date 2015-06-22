@@ -13,7 +13,6 @@ class GaugePlot : public QCustomPlot {
 
 private:
     QCPGraph *graph[5];
-    QCPGraph *dot[5];
 
     double timeRange;
     TriggerOptions triggerOptions;
@@ -40,15 +39,17 @@ public slots:
     void setShowMode(ShowMode mode);
     void setTriggerOptions(TriggerOptions options);
     void setChannelVisible(int channel, bool on);
-    void appendMeasurement(Measurement &data);
 
+    void appendMeasurement(Measurement &data);
     void showFrame(Connection::Frame &frame);
 
 private:
+    QCPGraph *createNewChannel(QColor color);
+    void setupAxis();
+
     void setupRealTimeMode();
     void setupFrameMode();
 
-    void setupGraphChannel(int channel, QColor color);
     void updateGraphChannel(int channel, double time, double voltage);
 
     void moveGraphForTrigger(Connection::Frame &data);

@@ -3,49 +3,31 @@
 
 GaugePlot::GaugePlot() : QCustomPlot() {
 
-    // Null channel
-    graph[0] = nullptr;
-    dot[0] = nullptr;
+    graph[0] = nullptr; // Null channel
+    graph[1] = createNewChannel(Qt::blue);
+    graph[2] = createNewChannel(Qt::red);
+    graph[3] = createNewChannel(Qt::darkGreen);
+    graph[4] = createNewChannel(Qt::magenta);
 
-    // Channel 1
-    graph[1] = addGraph();
-    dot[1] = addGraph();
-    setupGraphChannel(1, Qt::blue);
-
-    // Channel 2
-    graph[2] = addGraph();
-    dot[2] = addGraph();
-    setupGraphChannel(2, Qt::red);
-
-    // Channel 3
-    graph[3] = addGraph();
-    dot[3] = addGraph();
-    setupGraphChannel(3, Qt::darkGreen);
-
-    // Channel 4
-    graph[4] = addGraph();
-    dot[4] = addGraph();
-    setupGraphChannel(4, Qt::magenta);
-
-    xAxis->setTickLabelType(QCPAxis::ltDateTime);
-    xAxis->setDateTimeFormat("hh:mm:ss");
-    xAxis->setAutoTickStep(false);
-    xAxis->grid()->setZeroLinePen(Qt::NoPen);
-    axisRect()->setupFullAxesBox();
-
+    setupAxis();
     setVoltageRange(-0.05, 5.15);
     setTimeRange(8.0);
     setTriggerOptions(DEFAULT_TRIGGER_OPTIONS);
 }
 
+QCPGraph *GaugePlot::createNewChannel(QColor color) {
+    QCPGraph *newGraph = addGraph();
+    newGraph->setPen(QPen(color));
+    newGraph->setLineStyle(QCPGraph::lsLine);
+    return newGraph;
+}
 
-void GaugePlot::setupGraphChannel(int channel, QColor color) {
-    graph[channel]->setPen(QPen(color));
-    graph[channel]->setLineStyle(QCPGraph::lsLine);
-
-    dot[channel]->setPen(QPen(color));
-    dot[channel]->setLineStyle(QCPGraph::lsNone);
-    dot[channel]->setScatterStyle(QCPScatterStyle::ssDisc);
+void GaugePlot::setupAxis() {
+    xAxis->setTickLabelType(QCPAxis::ltDateTime);
+    xAxis->setDateTimeFormat("hh:mm:ss");
+    xAxis->setAutoTickStep(false);
+    xAxis->grid()->setZeroLinePen(Qt::NoPen);
+    axisRect()->setupFullAxesBox();
 }
 
 void GaugePlot::setVoltageRange(double min, double max) {
@@ -64,7 +46,6 @@ void GaugePlot::setTimeRange(double time) {
 
 void GaugePlot::setChannelVisible(int channel, bool on) {
     graph[channel]->setVisible(on);
-    dot[channel]->setVisible(on);
 }
 
 QColor GaugePlot::getChannelColor(int channel) {
@@ -94,7 +75,6 @@ void GaugePlot::setupFrameMode() {
 void GaugePlot::clearAllChannel() {
     for (int i = 1; i <= 4; i++) {
         graph[i]->clearData();
-        dot[i]->clearData();
     }
     xAxis->setRange(0, 0);
     replot();
@@ -118,9 +98,6 @@ void GaugePlot::appendMeasurement(Measurement &data) {
 void GaugePlot::updateGraphChannel(int channel, double time, double voltage) {
     graph[channel]->addData(time, voltage);
     graph[channel]->removeDataBefore(time - (timeRange * 2));
-
-    dot[channel]->clearData();
-    dot[channel]->addData(time, voltage);
 }
 
 void GaugePlot::showFrame(Connection::Frame &data) {
