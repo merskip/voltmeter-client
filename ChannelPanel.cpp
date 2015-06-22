@@ -19,6 +19,7 @@ ChannelPanel::ChannelPanel(int channel, QString name, QColor color)
     voltageFont->setPixelSize(18);
     voltageFont->setBold(true);
     voltageLabel->setFont(*voltageFont);
+    voltageLabel->setAlignment(Qt::AlignRight);
 
     QHBoxLayout *topLayout = new QHBoxLayout();
     topLayout->addWidget(nameLabel);
