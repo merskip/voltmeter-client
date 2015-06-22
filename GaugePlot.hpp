@@ -52,9 +52,9 @@ private:
     void updateGraphChannel(int channel, double time, double voltage);
 
     void moveGraphForTrigger(Connection::Frame &data);
+    int getShiftForTrigger(Connection::Frame &data);
     void moveGraph(int shift, int margin = 0);
-    static int getShiftForTrigger(int channel, double voltage, Connection::Frame &data);
-    static bool belongsTo(double value, double a, double b);
+
 
 signals:
     void isDone();

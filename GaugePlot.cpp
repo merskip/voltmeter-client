@@ -1,4 +1,5 @@
 #include "GaugePlot.hpp"
+#include "FrameShiftTrigger.hpp"
 
 GaugePlot::GaugePlot() : QCustomPlot() {
 
@@ -145,11 +146,13 @@ void GaugePlot::showFrame(Connection::Frame &data) {
 }
 
 void GaugePlot::moveGraphForTrigger(Connection::Frame &data) {
-    int channel = triggerOptions.channel;
-    int dataSize = graph[channel]->data()->size();
-    int shift = getShiftForTrigger(channel, triggerOptions.voltage, data);
+    int shift = getShiftForTrigger(data);
+    moveGraph(shift, data.size() / 8);
+}
 
-    moveGraph(shift, dataSize / 5);
+int GaugePlot::getShiftForTrigger(Connection::Frame &data) {
+    FrameShiftTrigger trigger(triggerOptions, data);
+    return trigger.calculateShift();
 }
 
 void GaugePlot::moveGraph(int shift, int margin) {
@@ -160,40 +163,4 @@ void GaugePlot::moveGraph(int shift, int margin) {
     upper += shift - margin;
 
     xAxis->setRange(lower, upper);
-}
-
-int GaugePlot::getShiftForTrigger(int channel, double voltage, Connection::Frame &data) {
-
-    int dataSize = data.size();
-    int sizeHalf = dataSize / 2;
-    for (int i = 0; i < sizeHalf; i++) {
-        int indexLeft = sizeHalf - i;
-        int indexLeftNext = indexLeft - 1;
-
-        int indexRight = sizeHalf + i;
-        int indexRightNext = indexRight + 1;
-
-        if (indexLeftNext >= 0) {
-            double leftValue = data.at(indexLeft).at(channel);
-            double leftNextValue = data.at(indexLeftNext).at(channel);
-
-            if (belongsTo(voltage, leftValue, leftNextValue) && leftValue < leftNextValue)
-                return -i;
-        }
-
-        if (indexRightNext < dataSize) {
-            double rightValue = data.at(indexRight).at(channel);
-            double rightNextValue = data.at(indexRightNext).at(channel);
-
-            if (belongsTo(voltage, rightValue, rightNextValue) && rightValue > rightNextValue)
-                return i;
-        }
-    }
-    return 0;
-}
-
-bool GaugePlot::belongsTo(double value, double a, double b) {
-    double min = std::min(a, b);
-    double max = std::max(a, b);
-    return value >= min && value <= max;
 }

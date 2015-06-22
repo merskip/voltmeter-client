@@ -26,7 +26,8 @@ set(SOURCE_FILES
     GaugePlot.cpp
     MainWindow.cpp
     ShowMode.hpp
-    TriggerOptions.hpp)
+    TriggerOptions.hpp
+    FrameShiftTrigger.cpp)
 add_executable(voltmeter ${SOURCE_FILES})
 
 target_link_libraries(voltmeter Qt5::Widgets Qt5::PrintSupport Qt5::Network Qt5::SerialPort)
