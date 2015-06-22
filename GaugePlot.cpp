@@ -30,9 +30,10 @@ GaugePlot::GaugePlot() : QCustomPlot() {
     xAxis->setTickLabelType(QCPAxis::ltDateTime);
     xAxis->setDateTimeFormat("hh:mm:ss");
     xAxis->setAutoTickStep(false);
+    xAxis->grid()->setZeroLinePen(Qt::NoPen);
     axisRect()->setupFullAxesBox();
 
-    setVoltageRange(-0.2, 5.3);
+    setVoltageRange(-0.05, 5.15);
     setTimeRange(8.0);
     setTriggerOptions(DEFAULT_TRIGGER_OPTIONS);
 }
