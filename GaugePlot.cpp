@@ -10,9 +10,11 @@ GaugePlot::GaugePlot() : QCustomPlot() {
     graph[4] = createNewChannel(Qt::magenta);
 
     setupAxis();
+    createTriggerLines();
     setVoltageRange(-0.05, 5.15);
     setTimeRange(8.0);
     setTriggerOptions(DEFAULT_TRIGGER_OPTIONS);
+    setShowMode(ShowMode::RealTimeMode);
 }
 
 QCPGraph *GaugePlot::createNewChannel(QColor color) {
@@ -28,6 +30,26 @@ void GaugePlot::setupAxis() {
     xAxis->setAutoTickStep(false);
     xAxis->grid()->setZeroLinePen(Qt::NoPen);
     axisRect()->setupFullAxesBox();
+}
+
+
+void GaugePlot::createTriggerLines() {
+    triggerVLine = createNewTriggerLine();
+    addItem(triggerVLine);
+
+    triggerHLine = createNewTriggerLine();
+    addItem(triggerHLine);
+}
+
+QCPItemLine *GaugePlot::createNewTriggerLine() {
+    QCPItemLine *newLine = new QCPItemLine(this);
+    newLine->start->setType(QCPItemPosition::ptPlotCoords);
+    newLine->end->setType(QCPItemPosition::ptPlotCoords);
+    newLine->start->setAxes(xAxis, yAxis);
+    newLine->end->setAxes(xAxis, yAxis);
+    newLine->setLayer("grid");
+    newLine->setPen(QPen(Qt::gray, 1));
+    return newLine;
 }
 
 void GaugePlot::setVoltageRange(double min, double max) {
@@ -52,7 +74,6 @@ QColor GaugePlot::getChannelColor(int channel) {
     return graph[channel]->pen().color();
 }
 
-
 void GaugePlot::setShowMode(ShowMode mode) {
     if (mode == RealTimeMode)
         setupRealTimeMode();
@@ -62,12 +83,14 @@ void GaugePlot::setShowMode(ShowMode mode) {
 
 void GaugePlot::setupRealTimeMode() {
     setTimeRange(timeRange);
+    setTriggerLinesVisible(false);
     xAxis->setTickLabelType(QCPAxis::LabelType::ltDateTime);
     xAxis->setTicks(true);
 }
 
 void GaugePlot::setupFrameMode() {
     clearAllChannel();
+    setTriggerLinesVisible(triggerOptions.isActive);
     xAxis->setTickLabelType(QCPAxis::LabelType::ltNumber);
     xAxis->setTicks(false);
 }
@@ -82,6 +105,13 @@ void GaugePlot::clearAllChannel() {
 
 void GaugePlot::setTriggerOptions(TriggerOptions options) {
     this->triggerOptions = options;
+    setTriggerLinesVisible(options.isActive);
+    setupTriggerHorizontalLinePosition();
+}
+
+void GaugePlot::setTriggerLinesVisible(bool visible) {
+    triggerVLine->setVisible(visible);
+    triggerHLine->setVisible(visible);
 }
 
 void GaugePlot::appendMeasurement(Measurement &data) {
@@ -116,8 +146,10 @@ void GaugePlot::showFrame(Connection::Frame &data) {
     }
     xAxis->setRange(0, dataSize);
 
-    if (triggerOptions.isActive)
+    if (triggerOptions.isActive) {
         moveGraphForTrigger(data);
+        setupTriggerLinesPosition();
+    }
 
     replot();
     emit isDone();
@@ -141,4 +173,27 @@ void GaugePlot::moveGraph(int shift, int margin) {
     upper += shift - margin;
 
     xAxis->setRange(lower, upper);
+}
+
+void GaugePlot::setupTriggerLinesPosition() {
+    setupTriggerVerticalLinePosition();
+    setupTriggerHorizontalLinePosition();
+}
+
+void GaugePlot::setupTriggerVerticalLinePosition() {
+    double xTrigger = xAxis->range().center();
+    double yStart = yAxis->range().lower;
+    double yEnd = yAxis->range().upper;
+
+    triggerVLine->start->setCoords(xTrigger, yStart);
+    triggerVLine->end->setCoords(xTrigger, yEnd);
+}
+
+void GaugePlot::setupTriggerHorizontalLinePosition() {
+    double yTrigger = triggerOptions.voltage;
+    double xStart = xAxis->range().lower;
+    double xEnd = xAxis->range().upper;
+
+    triggerHLine->start->setCoords(xStart, yTrigger);
+    triggerHLine->end->setCoords(xEnd, yTrigger);
 }

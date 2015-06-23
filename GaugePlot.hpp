@@ -16,6 +16,8 @@ private:
 
     double timeRange;
     TriggerOptions triggerOptions;
+    QCPItemLine *triggerVLine;
+    QCPItemLine *triggerHLine;
 
 public:
     GaugePlot();
@@ -34,6 +36,7 @@ public:
     QColor getChannelColor(int channel);
 
     void clearAllChannel();
+    void setTriggerLinesVisible(bool visible);
 
 public slots:
     void setShowMode(ShowMode mode);
@@ -46,6 +49,8 @@ public slots:
 private:
     QCPGraph *createNewChannel(QColor color);
     void setupAxis();
+    void createTriggerLines();
+    QCPItemLine *createNewTriggerLine();
 
     void setupRealTimeMode();
     void setupFrameMode();
@@ -56,6 +61,9 @@ private:
     int getShiftForTrigger(Connection::Frame &data);
     void moveGraph(int shift, int margin = 0);
 
+    void setupTriggerLinesPosition();
+    void setupTriggerVerticalLinePosition();
+    void setupTriggerHorizontalLinePosition();
 
 signals:
     void isDone();
