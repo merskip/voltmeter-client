@@ -23,6 +23,7 @@ QLayout *TriggerOptionsDialog::createLayoutUI() {
     voltageEdit->setSuffix(" V");
     voltageEdit->setDecimals(2);
     voltageEdit->setSingleStep(0.1);
+    voltageEdit->setRange(0.0, 5.1);
     voltageEdit->setButtonSymbols(QAbstractSpinBox::PlusMinus);
 
     edgeSelect = new QComboBox();
