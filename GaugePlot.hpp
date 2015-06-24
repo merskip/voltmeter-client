@@ -15,6 +15,8 @@ private:
     QCPGraph *graph[5];
 
     double timeRange;
+    double timeFrame;
+
     TriggerOptions triggerOptions;
     QCPItemLine *triggerVLine;
     QCPItemLine *triggerHLine;
@@ -26,12 +28,13 @@ public:
         setTimeRange((double) time / 1000);
     }
 
+    inline void setTimeFrameMillis(int time) {
+        setTimeFrame((double) time / 1000);
+    }
+
     void setVoltageRange(double min, double max);
     void setTimeRange(double time);
-
-    inline double getTimeRange() {
-        return timeRange;
-    }
+    void setTimeFrame(double time);
 
     QColor getChannelColor(int channel);
 

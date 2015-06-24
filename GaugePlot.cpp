@@ -66,6 +66,10 @@ void GaugePlot::setTimeRange(double time) {
         xAxis->setDateTimeFormat("zzz");
 }
 
+void GaugePlot::setTimeFrame(double time) {
+    timeFrame = time;
+}
+
 void GaugePlot::setChannelVisible(int channel, bool on) {
     graph[channel]->setVisible(on);
 }
@@ -82,16 +86,14 @@ void GaugePlot::setShowMode(ShowMode mode) {
 }
 
 void GaugePlot::setupRealTimeMode() {
-    setTimeRange(timeRange);
     setTriggerLinesVisible(false);
-    xAxis->setTickLabelType(QCPAxis::LabelType::ltDateTime);
+    setTimeRange(timeRange);
     xAxis->setTicks(true);
 }
 
 void GaugePlot::setupFrameMode() {
-    clearAllChannel();
     setTriggerLinesVisible(triggerOptions.isActive);
-    xAxis->setTickLabelType(QCPAxis::LabelType::ltNumber);
+    setTimeFrame(timeFrame);
     xAxis->setTickStep(1.0);
     xAxis->setTicks(false);
 }

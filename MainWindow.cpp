@@ -148,6 +148,7 @@ void MainWindow::startRealTimeMode() {
 
 void MainWindow::startFrameMode() {
     this->timeFrame = sidePanel->getTimeFrame();
+    plot->setTimeFrameMillis(timeFrame);
     setNullVoltage();
     timer->setSingleShot(true);
     timer->setInterval(0);
@@ -214,6 +215,8 @@ void MainWindow::timeIntervalChanged(int timeInterval) {
 
 void MainWindow::timeFrameChanged(int timeFrame) {
     this->timeFrame = timeFrame;
+    if (isFrameMode())
+        plot->setTimeFrameMillis(timeFrame);
 }
 
 bool MainWindow::isRealTimeMode() {
