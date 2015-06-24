@@ -32,7 +32,6 @@ void GaugePlot::setupAxis() {
     axisRect()->setupFullAxesBox();
 }
 
-
 void GaugePlot::createTriggerLines() {
     triggerVLine = createNewTriggerLine();
     addItem(triggerVLine);
@@ -49,6 +48,7 @@ QCPItemLine *GaugePlot::createNewTriggerLine() {
     newLine->end->setAxes(xAxis, yAxis);
     newLine->setLayer("grid");
     newLine->setPen(QPen(Qt::gray, 1));
+    newLine->setAntialiased(false);
     return newLine;
 }
 
@@ -92,6 +92,7 @@ void GaugePlot::setupFrameMode() {
     clearAllChannel();
     setTriggerLinesVisible(triggerOptions.isActive);
     xAxis->setTickLabelType(QCPAxis::LabelType::ltNumber);
+    xAxis->setTickStep(1.0);
     xAxis->setTicks(false);
 }
 
