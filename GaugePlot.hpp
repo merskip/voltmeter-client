@@ -14,6 +14,7 @@ class GaugePlot : public QCustomPlot {
 private:
     QCPGraph *graph[5];
 
+    ShowMode showMode;
     double timeRange;
     double timeFrame;
 

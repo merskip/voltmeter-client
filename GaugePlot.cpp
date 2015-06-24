@@ -30,6 +30,9 @@ void GaugePlot::setupAxis() {
     xAxis->setAutoTickStep(false);
     xAxis->grid()->setZeroLinePen(Qt::NoPen);
     axisRect()->setupFullAxesBox();
+
+    yAxis->setAutoTicks(false);
+    QVector<double> ticks({0.0, 0.6, 1.5, 2.4, 3.3, 4.2, 5.1});
 }
 
 void GaugePlot::createTriggerLines() {
@@ -79,6 +82,7 @@ QColor GaugePlot::getChannelColor(int channel) {
 }
 
 void GaugePlot::setShowMode(ShowMode mode) {
+    this->showMode = mode;
     if (mode == RealTimeMode)
         setupRealTimeMode();
     else
