@@ -55,72 +55,6 @@ QCPItemLine *GaugePlot::createNewTriggerLine() {
     return newLine;
 }
 
-void GaugePlot::setVoltageRange(double min, double max) {
-    yAxis->setRange(min, max);
-    replot();
-}
-
-void GaugePlot::setTimeRange(double time) {
-    timeRange = time;
-    xAxis->setTickStep(time / 4.0);
-    if (time >= 1.0)
-        xAxis->setDateTimeFormat("hh:mm:ss");
-    else
-        xAxis->setDateTimeFormat("zzz");
-}
-
-void GaugePlot::setTimeFrame(double time) {
-    timeFrame = time;
-}
-
-void GaugePlot::setChannelVisible(int channel, bool on) {
-    graph[channel]->setVisible(on);
-}
-
-QColor GaugePlot::getChannelColor(int channel) {
-    return graph[channel]->pen().color();
-}
-
-void GaugePlot::setShowMode(ShowMode mode) {
-    this->showMode = mode;
-    if (mode == RealTimeMode)
-        setupRealTimeMode();
-    else
-        setupFrameMode();
-}
-
-void GaugePlot::setupRealTimeMode() {
-    setTriggerLinesVisible(false);
-    setTimeRange(timeRange);
-    xAxis->setTicks(true);
-}
-
-void GaugePlot::setupFrameMode() {
-    setTriggerLinesVisible(triggerOptions.isActive);
-    setTimeFrame(timeFrame);
-    xAxis->setTickStep(1.0);
-    xAxis->setTicks(false);
-}
-
-void GaugePlot::clearAllChannel() {
-    for (int i = 1; i <= 4; i++) {
-        graph[i]->clearData();
-    }
-    xAxis->setRange(0, 0);
-    replot();
-}
-
-void GaugePlot::setTriggerOptions(TriggerOptions options) {
-    this->triggerOptions = options;
-    setTriggerLinesVisible(options.isActive);
-    setupTriggerHorizontalLinePosition();
-}
-
-void GaugePlot::setTriggerLinesVisible(bool visible) {
-    triggerVLine->setVisible(visible);
-    triggerHLine->setVisible(visible);
-}
-
 void GaugePlot::appendMeasurement(Measurement &data) {
     updateGraphChannel(1, data.time, data.channel[1].voltage);
     updateGraphChannel(2, data.time, data.channel[2].voltage);
@@ -182,6 +116,46 @@ void GaugePlot::moveGraph(double shift, int margin) {
     xAxis->setRange(lower, upper);
 }
 
+void GaugePlot::setShowMode(ShowMode mode) {
+    this->showMode = mode;
+    if (mode == RealTimeMode)
+        setupRealTimeMode();
+    else
+        setupFrameMode();
+}
+
+void GaugePlot::setupRealTimeMode() {
+    setTriggerLinesVisible(false);
+    setTimeRange(timeRange);
+    xAxis->setTicks(true);
+}
+
+void GaugePlot::setupFrameMode() {
+    setTriggerLinesVisible(triggerOptions.isActive);
+    setTimeFrame(timeFrame);
+    xAxis->setTickStep(1.0);
+    xAxis->setTicks(false);
+}
+
+void GaugePlot::clearAllChannel() {
+    for (int i = 1; i <= 4; i++) {
+        graph[i]->clearData();
+    }
+    xAxis->setRange(0, 0);
+    replot();
+}
+
+void GaugePlot::setTriggerOptions(TriggerOptions options) {
+    this->triggerOptions = options;
+    setTriggerLinesVisible(options.isActive);
+    setupTriggerHorizontalLinePosition();
+}
+
+void GaugePlot::setTriggerLinesVisible(bool visible) {
+    triggerVLine->setVisible(visible);
+    triggerHLine->setVisible(visible);
+}
+
 void GaugePlot::setupTriggerLinesPosition() {
     setupTriggerVerticalLinePosition();
     setupTriggerHorizontalLinePosition();
@@ -203,4 +177,30 @@ void GaugePlot::setupTriggerHorizontalLinePosition() {
 
     triggerHLine->start->setCoords(xStart, yTrigger);
     triggerHLine->end->setCoords(xEnd, yTrigger);
+}
+
+void GaugePlot::setTimeRange(double time) {
+    timeRange = time;
+    xAxis->setTickStep(time / 4.0);
+    if (time >= 1.0)
+        xAxis->setDateTimeFormat("hh:mm:ss");
+    else
+        xAxis->setDateTimeFormat("zzz");
+}
+
+void GaugePlot::setTimeFrame(double time) {
+    timeFrame = time;
+}
+
+void GaugePlot::setChannelVisible(int channel, bool on) {
+    graph[channel]->setVisible(on);
+}
+
+QColor GaugePlot::getChannelColor(int channel) {
+    return graph[channel]->pen().color();
+}
+
+void GaugePlot::setVoltageRange(double min, double max) {
+    yAxis->setRange(min, max);
+    replot();
 }
