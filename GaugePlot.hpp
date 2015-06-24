@@ -58,8 +58,8 @@ private:
     void updateGraphChannel(int channel, double time, double voltage);
 
     void moveGraphForTrigger(Connection::Frame &data);
-    int getShiftForTrigger(Connection::Frame &data);
-    void moveGraph(int shift, int margin = 0);
+    double getShiftForTrigger(Connection::Frame &data);
+    void moveGraph(double shift, int margin = 0);
 
     void setupTriggerLinesPosition();
     void setupTriggerVerticalLinePosition();

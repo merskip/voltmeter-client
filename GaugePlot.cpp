@@ -156,16 +156,16 @@ void GaugePlot::showFrame(Connection::Frame &data) {
 }
 
 void GaugePlot::moveGraphForTrigger(Connection::Frame &data) {
-    int shift = getShiftForTrigger(data);
+    double shift = getShiftForTrigger(data);
     moveGraph(shift, data.size() / 8);
 }
 
-int GaugePlot::getShiftForTrigger(Connection::Frame &data) {
+double GaugePlot::getShiftForTrigger(Connection::Frame &data) {
     FrameShiftTrigger trigger(triggerOptions, data);
     return trigger.calculateShift();
 }
 
-void GaugePlot::moveGraph(int shift, int margin) {
+void GaugePlot::moveGraph(double shift, int margin) {
     double lower = xAxis->range().lower;
     double upper = xAxis->range().upper;
 
