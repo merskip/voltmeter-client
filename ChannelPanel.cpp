@@ -15,10 +15,10 @@ ChannelPanel::ChannelPanel(int channel, QString name, QColor color)
     voltageLabel->setLineWidth(2);
     voltageLabel->setFrameStyle(QFrame::Box);
 
-    voltageFont = new QFont("Courier New");
-    voltageFont->setPixelSize(18);
-    voltageFont->setBold(true);
-    voltageLabel->setFont(*voltageFont);
+    QFont voltageFont("Courier New");
+    voltageFont.setPixelSize(18);
+    voltageFont.setBold(true);
+    voltageLabel->setFont(voltageFont);
     voltageLabel->setAlignment(Qt::AlignRight);
 
     QHBoxLayout *topLayout = new QHBoxLayout();

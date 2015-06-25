@@ -13,7 +13,6 @@ private:
     QLabel *nameLabel;
     QPushButton *toggleBtn;
     QLabel *voltageLabel;
-    QFont *voltageFont;
 
     bool channelVisible;
     QPalette paletteEnabled;
