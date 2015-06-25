@@ -48,6 +48,7 @@ public slots:
     void setShowMode(ShowMode mode);
     void setTriggerOptions(TriggerOptions options);
     void setChannelVisible(int channel, bool on);
+    bool isChannelVisible(int channel);
 
     void appendMeasurement(Measurement &data);
     void showFrame(Connection::Frame &frame);
@@ -58,6 +59,7 @@ private:
     void createTriggersPointsAndLines();
     QCPItemLine *createNewTriggerLine();
     QCPGraph *createTriggersPoints();
+    void setupTriggersPoints();
 
     void setupRealTimeMode();
     void setupFrameMode();

@@ -59,7 +59,7 @@ QCPItemLine *GaugePlot::createNewTriggerLine() {
 QCPGraph *GaugePlot::createTriggersPoints() {
     QCPGraph *points = addGraph();
     points->setLineStyle(QCPGraph::lsNone);
-    points->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
+    points->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 4));
     points->setPen(QPen(Qt::black));
     return points;
 }
@@ -140,7 +140,7 @@ void GaugePlot::setupRealTimeMode() {
 
 void GaugePlot::setupFrameMode() {
     setTriggerLinesVisible(triggerOptions.isActive);
-    triggersPoints->setVisible(triggerOptions.isActive && triggerOptions.isShowCalls);
+    setupTriggersPoints();
 
     setTimeFrame(timeFrame);
     xAxis->setTickStep(1.0);
@@ -159,13 +159,27 @@ void GaugePlot::clearAllChannel() {
 void GaugePlot::setTriggerOptions(TriggerOptions options) {
     this->triggerOptions = options;
     setTriggerLinesVisible(options.isActive);
-    triggersPoints->setVisible(options.isActive && triggerOptions.isShowCalls);
+    setupTriggersPoints();
     updateTriggerHorizontalLinePosition();
 }
 
 void GaugePlot::setTriggerLinesVisible(bool visible) {
     triggerVLine->setVisible(visible);
     triggerHLine->setVisible(visible);
+}
+
+void GaugePlot::setupTriggersPoints() {
+    bool triggerIsActive = triggerOptions.isActive;
+    bool isShowCalls = triggerOptions.isShowCalls;
+    bool isShowChannel = isChannelVisible(triggerOptions.channel);
+    bool visible = triggerIsActive && isShowCalls && isShowChannel;
+    triggersPoints->setVisible(visible);
+
+    QColor channelColor = getChannelColor(triggerOptions.channel);
+    QColor pointsColor = channelColor.darker();
+    QPen pointsPen = triggersPoints->pen();
+    pointsPen.setColor(pointsColor);
+    triggersPoints->setPen(pointsPen);
 }
 
 void GaugePlot::updateTriggersPoints(FrameTrigger &frameTrigger) {
@@ -212,8 +226,13 @@ void GaugePlot::setTimeFrame(double time) {
     timeFrame = time;
 }
 
+bool GaugePlot::isChannelVisible(int channel) {
+    return graph[channel]->visible();
+}
+
 void GaugePlot::setChannelVisible(int channel, bool on) {
     graph[channel]->setVisible(on);
+    setupTriggersPoints();
 }
 
 QColor GaugePlot::getChannelColor(int channel) {
