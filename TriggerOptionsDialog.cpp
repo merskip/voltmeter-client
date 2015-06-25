@@ -31,18 +31,21 @@ QLayout *TriggerOptionsDialog::createLayoutUI() {
     edgeSelect->addItem("Rosnące", TriggerOptions::RisingEdge);
     edgeSelect->addItem("Opadające", TriggerOptions::FallingEdge);
 
+    showCallsCheck = new QCheckBox("Pokaż wywołania");
+
     formLayout = new QFormLayout();
     formLayout->addWidget(activeCheck);
     formLayout->addRow("Kanał: ", channelSelect);
     formLayout->addRow("Napięcie: ", voltageEdit);
     formLayout->addRow("Zbocze: ", edgeSelect);
+    formLayout->addWidget(showCallsCheck);
     return formLayout;
 }
 
 void TriggerOptionsDialog::setDialogSize(QLayout *layoutUI) {
     int heightHint = layoutUI->sizeHint().height();
     this->setFixedHeight(heightHint);
-    this->setMinimumWidth(270);
+    this->setFixedWidth(300);
 }
 
 void TriggerOptionsDialog::connectSignalsAndSlots() {
@@ -57,6 +60,9 @@ void TriggerOptionsDialog::connectSignalsAndSlots() {
 
     connect(edgeSelect, SIGNAL(currentIndexChanged(int)),
             this, SLOT(handleEdgeChanged(int)));
+
+    connect(showCallsCheck, SIGNAL(stateChanged(int)),
+            this, SLOT(handleShowCallsChanged(int)));
 }
 
 void TriggerOptionsDialog::handleActiveChanged(int state) {
@@ -84,6 +90,12 @@ void TriggerOptionsDialog::handleEdgeChanged(int index) {
     emit optionsChanged(currentOptions);
 }
 
+void TriggerOptionsDialog::handleShowCallsChanged(int state) {
+    bool isShowCalls = (bool) state;
+    currentOptions.isShowCalls = isShowCalls;
+    emit optionsChanged(currentOptions);
+}
+
 TriggerOptions TriggerOptionsDialog::getOptions() {
     return currentOptions;
 }
@@ -100,6 +112,8 @@ void TriggerOptionsDialog::setOptions(TriggerOptions options) {
     int edgeIndex = edgeSelect->findData(options.edge);
     edgeSelect->setCurrentIndex(edgeIndex);
 
+    showCallsCheck->setChecked(options.isShowCalls);
+
     currentOptions = options;
     emit optionsChanged(currentOptions);
 }
@@ -108,6 +122,7 @@ void TriggerOptionsDialog::setWidgetsEnable(bool enable) {
     channelSelect->setEnabled(enable);
     voltageEdit->setEnabled(enable);
     edgeSelect->setEnabled(enable);
+    showCallsCheck->setEnabled(enable);
 }
 
 void TriggerOptionsDialog::showEvent(QShowEvent *event) {

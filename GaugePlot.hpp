@@ -20,6 +20,7 @@ private:
     double timeFrame;
 
     TriggerOptions triggerOptions;
+    QCPGraph *triggersPoints;
     QCPItemLine *triggerVLine;
     QCPItemLine *triggerHLine;
 
@@ -54,8 +55,9 @@ public slots:
 private:
     QCPGraph *createNewChannel(QColor color);
     void setupAxis();
-    void createTriggerLines();
+    void createTriggersPointsAndLines();
     QCPItemLine *createNewTriggerLine();
+    QCPGraph *createTriggersPoints();
 
     void setupRealTimeMode();
     void setupFrameMode();
@@ -66,9 +68,10 @@ private:
     void moveGraphForTrigger(ShiftFrameTrigger &frameTrigger);
     void moveGraph(double shift);
 
-    void setupTriggerLinesPosition();
-    void setupTriggerVerticalLinePosition();
-    void setupTriggerHorizontalLinePosition();
+    void updateTriggersPoints(FrameTrigger &frameTrigger);
+    void updateTriggerLinesPosition();
+    void updateTriggerVerticalLinePosition();
+    void updateTriggerHorizontalLinePosition();
 
 signals:
     void isDone();

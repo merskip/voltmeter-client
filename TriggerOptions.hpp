@@ -2,6 +2,7 @@
 
 struct TriggerOptions {
     bool isActive;
+    bool isShowCalls;
     int channel;
     double voltage;
 
@@ -14,6 +15,7 @@ struct TriggerOptions {
 
 const TriggerOptions DEFAULT_TRIGGER_OPTIONS = {
         .isActive = true,
+        .isShowCalls = true,
         .channel = 1,
         .voltage = 2.7,
         .edge = TriggerOptions::FallingEdge
