@@ -1,6 +1,6 @@
 #include "MainWindow.hpp"
 
-MainWindow::MainWindow() {
+MainWindow::MainWindow() : QMainWindow() {
     connection = nullptr;
     plot = new GaugePlot();
     timer = new QTimer();

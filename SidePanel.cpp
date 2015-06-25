@@ -22,7 +22,7 @@ SidePanel::SidePanel() {
     timeIntervalEdit->setMinimumTime(QTime(0, 0, 0, 1));
     timeIntervalEdit->setTime(QTime(0, 0, 0, 10));
 
-    triggerOptionsDialog = new TriggerOptionsDialog();
+    triggerOptionsDialog = new TriggerOptionsDialog(this);
     triggerOptionsBtn = new QPushButton("Ustawienia");
 
     timeFrameEdit = new QTimeEdit();

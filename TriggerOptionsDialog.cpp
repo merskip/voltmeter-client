@@ -1,6 +1,7 @@
 #include "TriggerOptionsDialog.hpp"
 
-TriggerOptionsDialog::TriggerOptionsDialog() {
+TriggerOptionsDialog::TriggerOptionsDialog(QWidget *parent)
+        : QDialog(parent) {
     setWindowTitle("Ustawienia wyzwalacza");
 
     QLayout *ui = createLayoutUI();

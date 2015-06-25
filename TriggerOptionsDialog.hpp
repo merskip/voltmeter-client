@@ -23,7 +23,7 @@ private:
     QFormLayout *formLayout;
 
 public:
-    TriggerOptionsDialog();
+    TriggerOptionsDialog(QWidget *parent = 0);
 
     TriggerOptions getOptions();
     void setOptions(TriggerOptions options);
