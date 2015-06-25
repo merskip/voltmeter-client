@@ -1,5 +1,4 @@
 #include "GaugePlot.hpp"
-#include "FrameShiftTrigger.hpp"
 
 GaugePlot::GaugePlot() : QCustomPlot() {
 
@@ -88,7 +87,7 @@ void GaugePlot::showFrame(Connection::Frame &data) {
     xAxis->setRange(0, dataSize);
 
     if (triggerOptions.isActive) {
-        moveGraphForTrigger(data);
+        applyTrigger(data);
         setupTriggerLinesPosition();
     }
 
@@ -96,24 +95,19 @@ void GaugePlot::showFrame(Connection::Frame &data) {
     emit isDone();
 }
 
-void GaugePlot::moveGraphForTrigger(Connection::Frame &data) {
-    double shift = getShiftForTrigger(data);
-    moveGraph(shift, data.size() / 8);
+
+void GaugePlot::applyTrigger(Connection::Frame &data) {
+    ShiftFrameTrigger frameTrigger(triggerOptions, data);
+    moveGraphForTrigger(frameTrigger);
 }
 
-double GaugePlot::getShiftForTrigger(Connection::Frame &data) {
-    FrameShiftTrigger trigger(triggerOptions, data);
-    return trigger.calculateShift();
+void GaugePlot::moveGraphForTrigger(ShiftFrameTrigger &frameTrigger) {
+    double graphShift = frameTrigger.getShift();
+    moveGraph(graphShift);
 }
 
-void GaugePlot::moveGraph(double shift, int margin) {
-    double lower = xAxis->range().lower;
-    double upper = xAxis->range().upper;
-
-    lower += shift + margin;
-    upper += shift - margin;
-
-    xAxis->setRange(lower, upper);
+void GaugePlot::moveGraph(double shift) {
+    xAxis->moveRange(shift);
 }
 
 void GaugePlot::setShowMode(ShowMode mode) {

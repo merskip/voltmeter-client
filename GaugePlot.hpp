@@ -7,6 +7,7 @@
 #include "Connection.hpp"
 #include "ShowMode.hpp"
 #include "TriggerOptions.hpp"
+#include "ShiftFrameTrigger.hpp"
 
 class GaugePlot : public QCustomPlot {
     Q_OBJECT
@@ -61,9 +62,9 @@ private:
 
     void updateGraphChannel(int channel, double time, double voltage);
 
-    void moveGraphForTrigger(Connection::Frame &data);
-    double getShiftForTrigger(Connection::Frame &data);
-    void moveGraph(double shift, int margin = 0);
+    void applyTrigger(Connection::Frame &data);
+    void moveGraphForTrigger(ShiftFrameTrigger &frameTrigger);
+    void moveGraph(double shift);
 
     void setupTriggerLinesPosition();
     void setupTriggerVerticalLinePosition();
