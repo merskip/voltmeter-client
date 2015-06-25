@@ -12,14 +12,12 @@ double FrameShiftTrigger::calculateShift() {
     for (int i = 0; i < this->sizeHalf; i++) {
         indexes = getDataIndexes(i);
         if (canCheckOnLeft()) {
-            isOnLeft = true;
             calculateValuesOnLeft();
             if (checkValuesOnLeft()) {
                 return getDoubleShift(-i - 1);
             }
         }
         if (canCheckOnRight()) {
-            isOnLeft = false;
             calculateValuesOnRight();
             if (checkValuesOnRight())
                 return getDoubleShift(i);

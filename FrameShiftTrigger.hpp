@@ -17,13 +17,11 @@ public:
     int frameSize;
     int sizeHalf;
 
-    double fraction;
-    bool isOnLeft;
-
     DataIndexes indexes;
     double firstValue;
     double secondValue;
     EdgeType edge;
+    double fraction;
 
 public:
     FrameShiftTrigger(TriggerOptions &options, Connection::Frame &frame);
