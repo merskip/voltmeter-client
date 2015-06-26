@@ -10,6 +10,7 @@ GaugePlot::GaugePlot() : QCustomPlot() {
 
     setupAxis();
     createTriggersPointsAndLines();
+    setupFrequencyText();
     setVoltageRange(-0.05, 5.15);
     setTimeRange(8.0);
     setTriggerOptions(DEFAULT_TRIGGER_OPTIONS);
@@ -64,6 +65,19 @@ QCPGraph *GaugePlot::createTriggersPoints() {
     return points;
 }
 
+void GaugePlot::setupFrequencyText() {
+    frequencyText = new QCPItemText(this);
+    frequencyText->setPositionAlignment(Qt::AlignTop | Qt::AlignRight);
+    frequencyText->position->setType(QCPItemPosition::ptAxisRectRatio);
+    frequencyText->position->setCoords(1.0, 0.0); // Prawy górny róg
+    frequencyText->setFont(QFont("Courier New", 12));
+    frequencyText->setColor(Qt::black);
+    frequencyText->setPen(QPen(Qt::black));
+    frequencyText->setBrush(Qt::white);
+    frequencyText->setLayer("legend");
+    addItem(frequencyText);
+}
+
 void GaugePlot::appendMeasurement(Measurement &data) {
     updateGraphChannel(1, data.time, data.channel[1].voltage);
     updateGraphChannel(2, data.time, data.channel[2].voltage);
@@ -111,6 +125,8 @@ void GaugePlot::applyTrigger(Connection::Frame &data) {
     moveGraphForTrigger(frameTrigger);
     if (triggerOptions.isShowCalls)
         updateTriggersPoints(frameTrigger);
+
+    updateFrequency(frameTrigger);
 }
 
 void GaugePlot::moveGraphForTrigger(ShiftFrameTrigger &frameTrigger) {
@@ -120,6 +136,44 @@ void GaugePlot::moveGraphForTrigger(ShiftFrameTrigger &frameTrigger) {
 
 void GaugePlot::moveGraph(double shift) {
     xAxis->moveRange(shift);
+}
+
+void GaugePlot::updateFrequency(FrameTrigger &frameTrigger) {
+    double averageDiffKeys = calculateAverageDiffBetweenTriggerCalls(frameTrigger);
+    double secondsForOneKey = timeFrame / frameTrigger.getFrameSize();
+    double timePeriod = averageDiffKeys * secondsForOneKey;
+    double frequency = 1 / timePeriod;
+    updateFrequency(frequency);
+}
+
+double GaugePlot::calculateAverageDiffBetweenTriggerCalls(FrameTrigger &frameTrigger) {
+    QList<FrameTrigger::TriggerCall> callsList = frameTrigger.getTriggerCallsList();
+    QListIterator<FrameTrigger::TriggerCall> i(callsList);
+
+    if (callsList.empty())
+        return NAN;
+
+    double total = 0.0;
+    int count = 0;
+    while (i.hasNext()) {
+        FrameTrigger::TriggerCall call = i.next();
+        if (!i.hasNext()) break;
+        FrameTrigger::TriggerCall nextCall = i.peekNext();
+
+        if (call.edge == nextCall.edge) {
+            total += nextCall.key - call.key;
+            count++;
+        }
+    }
+    return total / count;
+}
+
+void GaugePlot::updateFrequency(double frequency) {
+    if (isnan(frequency)) frequency = 0;
+
+    double timePeriod = 1 / frequency * 1000;
+    QString text = QString().sprintf("T=%6.2f [ms]\nf=%6.2f [Hz]", timePeriod, frequency);
+    frequencyText->setText(text);
 }
 
 void GaugePlot::setShowMode(ShowMode mode) {
@@ -133,6 +187,7 @@ void GaugePlot::setShowMode(ShowMode mode) {
 void GaugePlot::setupRealTimeMode() {
     setTriggerLinesVisible(false);
     triggersPoints->setVisible(false);
+    frequencyText->setVisible(false);
 
     setTimeRange(timeRange);
     xAxis->setTicks(true);
@@ -141,6 +196,7 @@ void GaugePlot::setupRealTimeMode() {
 void GaugePlot::setupFrameMode() {
     setTriggerLinesVisible(triggerOptions.isActive);
     setupTriggersPoints();
+    frequencyText->setVisible(true);
 
     setTimeFrame(timeFrame);
     xAxis->setTickStep(1.0);

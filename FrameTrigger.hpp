@@ -37,6 +37,10 @@ public:
         return triggerCallsList.size() > 0;
     }
 
+    inline int getFrameSize() {
+        return frame.size();
+    }
+
 private:
     void calculateTriggerCallsList();
 

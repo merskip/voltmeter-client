@@ -24,6 +24,8 @@ private:
     QCPItemLine *triggerVLine;
     QCPItemLine *triggerHLine;
 
+    QCPItemText* frequencyText;
+
 public:
     GaugePlot();
 
@@ -60,6 +62,7 @@ private:
     QCPItemLine *createNewTriggerLine();
     QCPGraph *createTriggersPoints();
     void setupTriggersPoints();
+    void setupFrequencyText();
 
     void setupRealTimeMode();
     void setupFrameMode();
@@ -74,6 +77,10 @@ private:
     void updateTriggerLinesPosition();
     void updateTriggerVerticalLinePosition();
     void updateTriggerHorizontalLinePosition();
+
+    void updateFrequency(FrameTrigger &frameTrigger);
+    double calculateAverageDiffBetweenTriggerCalls(FrameTrigger &frameTrigger);
+    void updateFrequency(double frequency);
 
 signals:
     void isDone();
