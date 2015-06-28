@@ -1,13 +1,18 @@
 #pragma once
 
+#include <QElapsedTimer>
 #include "Connection.hpp"
 
 class EmulatorConnection : public Connection {
     Q_OBJECT
 
+private:
+    QElapsedTimer timer;
 
 public:
-    EmulatorConnection() { }
+    EmulatorConnection() {
+        timer.start();
+    }
 
     virtual QString toStringAddress();
 

@@ -40,7 +40,7 @@ Connection::Frame EmulatorConnection::downloadFrame(int duration) {
         data[4] = values.channel[4].voltage;
         frame.append(data);
 
-        QThread::usleep(500);
+        QThread::usleep(200);
     }
 
     emit downloadedFrame(frame);
@@ -48,10 +48,11 @@ Connection::Frame EmulatorConnection::downloadFrame(int duration) {
 }
 
 Measurement EmulatorConnection::calculate() {
-    qint64 millis = QDateTime::currentMSecsSinceEpoch();
-    double time = millis / 1000.0;
-    int value1 = millis % 80 >= 40 ? 255 : 0;
-    int value2 = (int) ((qSin(time) + 1.0) / 2 * 255);
+    qint64 nsecs = timer.nsecsElapsed();
+    quint64 millis = (quint64) (nsecs * 1.0e-6);
+
+    int value1 = (int) ((qSin(nsecs * 1.0e-9 * 300) + 1.0) / 2.0 * 255.0);
+    int value2 = millis % 80 >= 40 ? 255 : 0;
     int value3 = (int) (millis * 3 % 5000 / 5000.0 * 255.0 / 2.0);
     int value4 = qrand() % 255;
 
@@ -59,7 +60,7 @@ Measurement EmulatorConnection::calculate() {
         value3 = (int) (255.0 / 2.0 - value3);
 
     Measurement data = {
-            time,
+            nsecs * 1.0e-9,
             {{0, 0},
              {value1, toVoltage(value1)},
              {value2, toVoltage(value2)},
