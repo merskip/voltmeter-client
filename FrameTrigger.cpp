@@ -1,3 +1,4 @@
+#include <iostream>
 #include "FrameTrigger.hpp"
 
 FrameTrigger::FrameTrigger(TriggerOptions &options, Connection::Frame &frame)
@@ -34,12 +35,8 @@ void FrameTrigger::addTriggerCall() {
 }
 
 double FrameTrigger::getFractionKey() {
-    double fraction =  options.voltage / (firstValue - secondValue);
-
-    if (edge == EdgeType::FallingEdge)
-        return currentIndex - fraction + 1.0;
-    else // EdgeType::RisingEdge
-        return currentIndex - fraction;
+    double fraction =  (options.voltage - secondValue) / (firstValue - secondValue);
+    return currentIndex + 1.0 - fraction;
 }
 
 bool FrameTrigger::includeTriggerCall() {
