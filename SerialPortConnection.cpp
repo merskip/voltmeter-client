@@ -1,11 +1,12 @@
 #include <iostream>
 #include <QThread>
+#include <QDebug>
 #include "SerialPortConnection.hpp"
 
 void SerialPortConnection::createConnection() {
     setConnectionState(Connecting);
 
-    serial = new QSerialPort();
+    serial = new QSerialPort(this);
     device = serial;
 
     serial->setPortName(portName);
@@ -37,8 +38,7 @@ QString SerialPortConnection::toStringAddress() {
 }
 
 Measurement SerialPortConnection::downloadOne() {
-    serial->write("get_one");
-    serial->waitForReadyRead(1000);
+    serial->write("get_one\n");
     QByteArray message = readOneLine();
 
     QList<QByteArray> dataList = message.split(' ');

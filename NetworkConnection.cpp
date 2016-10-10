@@ -2,7 +2,7 @@
 #include "NetworkConnection.hpp"
 
 void NetworkConnection::createConnection() {
-    socket = new QTcpSocket();
+    socket = new QTcpSocket(this);
     device = socket;
 
     QObject::connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
@@ -28,8 +28,7 @@ QString NetworkConnection::toStringAddress() {
 }
 
 Measurement NetworkConnection::downloadOne() {
-    socket->write("get_one");
-    socket->waitForReadyRead(1000);
+    socket->write("get_one\n");
     QByteArray message = this->readOneLine();
 
     QList<QByteArray> dataList = message.split(' ');
