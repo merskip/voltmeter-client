@@ -1,6 +1,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QtSerialPort/qserialportinfo.h>
+#include <QtSerialPort/QSerialPortInfo>
 #include "ConnectionPanel.hpp"
 #include "NetworkConnection.hpp"
 #include "SerialPortConnection.hpp"
@@ -24,7 +24,7 @@ ConnectionPanel::ConnectionPanel() {
     setLayout(mainLayout);
 
     setupParamsLayout(Type::Network);
-    setConnectionState(Connection::Disconnected);
+    this->setConnectionState(Connection::Disconnected);
 
     connect(connectBtn, SIGNAL(clicked()),
             this, SLOT(handleConnectBtn()));

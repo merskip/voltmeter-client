@@ -1,4 +1,4 @@
-#include <QtWidgets/qboxlayout.h>
+#include <QtWidgets/QBoxLayout>
 #include "ChannelPanel.hpp"
 
 ChannelPanel::ChannelPanel(int channel, QString name, QColor color)
