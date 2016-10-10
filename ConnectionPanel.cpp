@@ -112,6 +112,9 @@ void ConnectionPanel::setupSerialLayout(QHBoxLayout *layout) {
         }
     }
 
+    if (serial.portNameSelect->currentIndex() == -1)
+        serial.portNameSelect->setCurrentIndex(0);
+
     serial.baudRateSelect = new QComboBox();
     for (auto baudRate : QSerialPortInfo::standardBaudRates()) {
         QString text = QString::number(baudRate);
