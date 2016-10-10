@@ -113,28 +113,40 @@ void MainWindow::setConnection(Connection *connection) {
 }
 
 void MainWindow::timerTick() {
-    if (!isBusy) {
-        isBusy = true;
-        if (isFrameMode()) {
-            emit doDownloadFrame(timeFrame);
-        } else {
-            emit doDownloadOne();
+    busyMutex.lock();
+    {
+        if (!isBusy) {
+            isBusy = true;
+            if (isFrameMode()) {
+                emit doDownloadFrame(timeFrame);
+            } else {
+                emit doDownloadOne();
+            }
         }
     }
+    busyMutex.unlock();
 }
 
 void MainWindow::plotIsDone() {
-    isBusy = false;
-    if (isFrameMode())
-        timer->start(0);
+    busyMutex.lock();
+    {
+        isBusy = false;
+        if (isFrameMode())
+            timer->start(0);
+    }
+    busyMutex.unlock();
 }
 
 void MainWindow::doStart() {
-    isBusy = false;
-    if (isRealTimeMode())
-        startRealTimeMode();
-    else
-        startFrameMode();
+    busyMutex.lock();
+    {
+        isBusy = false;
+        if (isRealTimeMode())
+            startRealTimeMode();
+        else
+            startFrameMode();
+    }
+    busyMutex.unlock();
 }
 
 void MainWindow::startRealTimeMode() {

@@ -11,6 +11,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
+    QMutex busyMutex;
     bool isBusy = false;
     bool isSocketError = false;
 
