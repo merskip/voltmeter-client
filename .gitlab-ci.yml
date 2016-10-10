@@ -1,0 +1,11 @@
+image: gcc
+
+build:
+    script:
+        - mkdir build
+        - cd build
+        - cmake ..
+        - make
+    tags:
+        - cmake
+        - gcc
