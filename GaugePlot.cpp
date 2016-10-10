@@ -169,7 +169,8 @@ double GaugePlot::calculateAverageDiffBetweenTriggerCalls(FrameTrigger &frameTri
 }
 
 void GaugePlot::updateFrequency(double frequency) {
-    if (isnan(frequency)) frequency = 0;
+    if (std::isnan(frequency))
+        frequency = 0;
 
     double timePeriod = 1 / frequency * 1000;
     QString text = QString().sprintf("T=%6.2f [ms]\nf=%6.2f [Hz]", timePeriod, frequency);

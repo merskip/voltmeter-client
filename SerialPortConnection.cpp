@@ -80,6 +80,10 @@ Connection::Frame SerialPortConnection::downloadFrame(int duration) {
     while (true) {
         QByteArray line = readByteArray(5);
 
+        if (line.size() != 5) {
+            break;
+        }
+
         char state = line.at(0);
         char value1 = line.at(1);
         char value2 = line.at(2);
