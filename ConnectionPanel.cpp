@@ -102,9 +102,8 @@ void ConnectionPanel::setupSerialLayout(QHBoxLayout *layout) {
 
     serial.portNameSelect = new QComboBox();
     for (auto portInfo : QSerialPortInfo::availablePorts()) {
-        QString text = portInfo.systemLocation();
-        QString data = portInfo.portName();
-        serial.portNameSelect->addItem(text, data);
+        QString text = portInfo.systemLocation() + " - " + portInfo.description();
+        serial.portNameSelect->addItem(text, portInfo.portName());
 
         if (portInfo.portName() == DEFAULT_SERIAL_PORT_NAME) {
             int index= serial.portNameSelect->count();
