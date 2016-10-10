@@ -17,5 +17,6 @@ protected:
     }
 
     QByteArray readOneLine();
+    QByteArray readByteArray(int size);
 
 };

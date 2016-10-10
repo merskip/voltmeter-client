@@ -39,6 +39,7 @@ QString SerialPortConnection::toStringAddress() {
 
 Measurement SerialPortConnection::downloadOne() {
     serial->write("get_one\n");
+    serial->waitForBytesWritten(1000);
     QByteArray message = readOneLine();
 
     QList<QByteArray> dataList = message.split(' ');
@@ -73,38 +74,34 @@ Connection::Frame SerialPortConnection::downloadFrame(int duration) {
     request.append(QString::number(duration));
     request.append("\n");
     serial->write(request);
+    serial->waitForBytesWritten(1000);
 
-    Connection::Frame data;
+    Connection::Frame frame;
     while (true) {
-        QByteArray line = readOneLine();
+        QByteArray line = readByteArray(5);
 
-        if (line.startsWith(':')) { // Koniec pomiarów
-            // Liczba miarów jest ignorowana, powinna się zgadzać
+        char state = line.at(0);
+        char value1 = line.at(1);
+        char value2 = line.at(2);
+        char value3 = line.at(3);
+        char value4 = line.at(4);
+
+        // Jeśli pierwszy bajt to 1 znaczy to, że dostępne są dane
+        if (state != 1) {
             break;
         }
 
-        QList<QByteArray> lineSplit = line.split(' ');
-        if (lineSplit.size() != 4) {
-            std::cerr << "Unknown message: " << line.toStdString() << std::endl;
-            break;
-        }
-
-        int value1 = lineSplit.at(0).toInt();
-        int value2 = lineSplit.at(1).toInt();
-        int value3 = lineSplit.at(2).toInt();
-        int value4 = lineSplit.at(3).toInt();
-
-        QVector<double> lineData(5);
-        lineData[0] = 0;
-        lineData[1] = toVoltage(value1);
-        lineData[2] = toVoltage(value2);
-        lineData[3] = toVoltage(value3);
-        lineData[4] = toVoltage(value4);
-        data.append(lineData);
+        QVector<double> data(5);
+        data[0] = 0;
+        data[1] = toVoltage(static_cast<unsigned char>(value1));
+        data[2] = toVoltage(static_cast<unsigned char>(value2));
+        data[3] = toVoltage(static_cast<unsigned char>(value3));
+        data[4] = toVoltage(static_cast<unsigned char>(value4));
+        frame.append(data);
     }
 
-    emit downloadedFrame(data);
-    return data;
+    emit downloadedFrame(frame);
+    return frame;
 }
 
 
