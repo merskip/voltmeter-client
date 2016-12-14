@@ -6,19 +6,35 @@
 void SerialPortConnection::createConnection() {
     setConnectionState(Connecting);
 
-    serial = new QSerialPort(this);
+    serial = new QSerialPort();
     device = serial;
 
     serial->setPortName(portName);
     serial->setBaudRate(baudRate);
 
-    QObject::connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
-                     this, SLOT(serialError(QSerialPort::SerialPortError)));
+    if (serial->open(QIODevice::ReadWrite)) {
+        waitForPing();
 
-    if (serial->open(QIODevice::ReadWrite))
+        QObject::connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
+                         this, SLOT(serialError(QSerialPort::SerialPortError)));
+
         setConnectionState(Connected);
-    else
+    } else {
         setConnectionState(Disconnected);
+    }
+}
+
+void SerialPortConnection::waitForPing() {
+    QByteArray message;
+    do {
+        if (message.size() == 0) {
+            serial->write(QByteArray("ping\n"));
+            serial->waitForBytesWritten(100);
+        }
+        serial->waitForReadyRead(100);
+
+        message += serial->readAll();
+    } while (!message.contains("\n"));
 }
 
 void SerialPortConnection::closeConnection() {

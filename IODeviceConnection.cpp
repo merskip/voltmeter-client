@@ -21,7 +21,7 @@ QByteArray IODeviceConnection::readByteArray(int size) {
 
     while (line.size() != size) {
         if (!device->bytesAvailable()) {
-            if (!device->isReadable() || !device->waitForReadyRead(1000))
+            if (!device->waitForReadyRead(1000))
                 break;
         }
 

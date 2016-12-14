@@ -37,6 +37,7 @@ private slots:
     void serialError(QSerialPort::SerialPortError serialError);
 
 private:
+    void waitForPing();
     static QString serialErrorToString(QSerialPort::SerialPortError error);
 
 };
