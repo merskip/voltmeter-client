@@ -55,6 +55,8 @@ MainWindow::MainWindow() : QMainWindow() {
             this, SLOT(timeIntervalChanged(int)));
     connect(sidePanel, SIGNAL(timeFrameChanged(int)),
             this, SLOT(timeFrameChanged(int)));
+    connect(sidePanel, SIGNAL(continueOneShot()),
+            this, SLOT(continueOneShot()));
 
     connect(sidePanel, SIGNAL(triggerOptionsChanged(TriggerOptions)),
             plot, SLOT(setTriggerOptions(TriggerOptions)));
@@ -69,6 +71,7 @@ MainWindow::MainWindow() : QMainWindow() {
             this, SLOT(setConnection(Connection*)));
 
     connect(plot, SIGNAL(isDone()), this, SLOT(plotIsDone()));
+    connect(plot, SIGNAL(oneShotActive()), this, SLOT(plotOneShotActive()));
 
     setNullVoltage();
     statusBar()->show();
@@ -131,16 +134,28 @@ void MainWindow::plotIsDone() {
     busyMutex.lock();
     {
         isBusy = false;
-        if (isFrameMode())
+        if (isFrameMode() && !waitOnOneShot)
             timer->start(0);
     }
     busyMutex.unlock();
+}
+
+void MainWindow::plotOneShotActive() {
+    waitOnOneShot = true;
+    sidePanel->setEnableContinueOneShot(true);
+}
+
+void MainWindow::continueOneShot() {
+    waitOnOneShot = false;
+    sidePanel->setEnableContinueOneShot(false);
+    doStart();
 }
 
 void MainWindow::doStart() {
     busyMutex.lock();
     {
         isBusy = false;
+        waitOnOneShot = false;
         if (isRealTimeMode())
             startRealTimeMode();
         else
@@ -162,6 +177,7 @@ void MainWindow::startFrameMode() {
     this->timeFrame = sidePanel->getTimeFrame();
     plot->setTimeFrameMillis(timeFrame);
     setNullVoltage();
+    sidePanel->setEnableContinueOneShot(false);
     timer->setSingleShot(true);
     timer->setInterval(0);
     timer->start();

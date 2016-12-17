@@ -14,6 +14,7 @@ private:
     QMutex busyMutex;
     bool isBusy = false;
     bool isSocketError = false;
+    bool waitOnOneShot = false;
 
     Connection *connection;
     GaugePlot *plot;
@@ -48,6 +49,8 @@ private slots:
     void timerTick();
 
     void plotIsDone();
+    void plotOneShotActive();
+    void continueOneShot();
 
     void doStart();
 

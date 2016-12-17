@@ -1,4 +1,5 @@
 #include "GaugePlot.hpp"
+#include "FrameShiftTrigger.hpp"
 
 GaugePlot::GaugePlot() : QCustomPlot() {
 
@@ -118,7 +119,6 @@ void GaugePlot::showFrame(Connection::Frame &data) {
     replot();
     emit isDone();
 }
-
 
 void GaugePlot::applyTrigger(Connection::Frame &data) {
     ShiftFrameTrigger frameTrigger(triggerOptions, data);

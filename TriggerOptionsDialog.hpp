@@ -18,7 +18,7 @@ private:
     QComboBox *channelSelect;
     QDoubleSpinBox *voltageEdit;
     QComboBox *edgeSelect;
-    QCheckBox *showCallsCheck;
+    QCheckBox *oneShotCheck;
 
     QFormLayout *formLayout;
 
@@ -45,6 +45,7 @@ private slots:
     void handleChannelChanged(int index);
     void handleVoltageChanged(double value);
     void handleEdgeChanged(int index);
+    void handleOneShotChanged(int state);
     void handleShowCallsChanged(int state);
 
 signals:

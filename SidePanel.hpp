@@ -30,11 +30,14 @@ private:
 
     TriggerOptionsDialog *triggerOptionsDialog;
     QPushButton *triggerOptionsBtn;
+    QPushButton *continueOneShotBtn;
 
 public:
     SidePanel();
 
     ChannelPanel *getChannelPanel(int channel);
+
+    void setEnableContinueOneShot(bool state);
 
     ShowMode getShowMode();
     void setShowMode(ShowMode mode);
@@ -65,6 +68,7 @@ private slots:
     void handleTimeFrameEdit(QTime time);
 
     void handleTriggerOptionsChanged(TriggerOptions options);
+    void handleContinueOneShowClick();
 
 signals:
     void showModeChanged(ShowMode mode);
@@ -74,4 +78,5 @@ signals:
     void timeFrameChanged(int timeFrame);
 
     void triggerOptionsChanged(TriggerOptions options);
+    void continueOneShot();
 };

@@ -24,6 +24,8 @@ SidePanel::SidePanel() {
 
     triggerOptionsDialog = new TriggerOptionsDialog(this);
     triggerOptionsBtn = new QPushButton("Ustawienia");
+    continueOneShotBtn = new QPushButton("Kontynuuj");
+    continueOneShotBtn->setEnabled(false);
 
     timeFrameEdit = new QTimeEdit();
     timeFrameEdit->setDisplayFormat("HH:mm:ss.zzz");
@@ -45,6 +47,7 @@ SidePanel::SidePanel() {
     frameLayout = new QVBoxLayout();
     frameLayout->addStretch(1);
     frameLayout->addWidget(triggerOptionsBtn);
+    frameLayout->addWidget(continueOneShotBtn);
     frameLayout->addWidget(new QLabel("Czas klatki:"));
     frameLayout->addWidget(timeFrameEdit);
     frameLayout->setContentsMargins(0, 0, 0, 0);
@@ -82,12 +85,18 @@ SidePanel::SidePanel() {
 
     connect(triggerOptionsDialog, SIGNAL(optionsChanged(TriggerOptions)),
             this, SLOT(handleTriggerOptionsChanged(TriggerOptions)));
+    connect(continueOneShotBtn, SIGNAL(clicked()),
+            this, SLOT(handleContinueOneShowClick()));
 
     setShowMode(RealTimeMode);
 }
 
 ChannelPanel *SidePanel::getChannelPanel(int channel) {
     return channelPanel[channel];
+}
+
+void SidePanel::setEnableContinueOneShot(bool state) {
+    continueOneShotBtn->setEnabled(state);
 }
 
 void SidePanel::handleFrameModeStateChanged(int state) {
@@ -146,4 +155,8 @@ void SidePanel::handleTimeFrameEdit(QTime time) {
 
 void SidePanel::handleTriggerOptionsChanged(TriggerOptions options) {
     emit triggerOptionsChanged(options);
+}
+
+void SidePanel::handleContinueOneShowClick() {
+    emit continueOneShot();
 }

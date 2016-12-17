@@ -32,6 +32,7 @@ QLayout *TriggerOptionsDialog::createLayoutUI() {
     edgeSelect->addItem("Rosnące", TriggerOptions::RisingEdge);
     edgeSelect->addItem("Opadające", TriggerOptions::FallingEdge);
 
+    oneShotCheck = new QCheckBox("OneShot");
     showCallsCheck = new QCheckBox("Pokaż wywołania");
 
     formLayout = new QFormLayout();
@@ -39,7 +40,6 @@ QLayout *TriggerOptionsDialog::createLayoutUI() {
     formLayout->addRow("Kanał: ", channelSelect);
     formLayout->addRow("Napięcie: ", voltageEdit);
     formLayout->addRow("Zbocze: ", edgeSelect);
-    formLayout->addWidget(showCallsCheck);
     return formLayout;
 }
 
@@ -61,6 +61,9 @@ void TriggerOptionsDialog::connectSignalsAndSlots() {
 
     connect(edgeSelect, SIGNAL(currentIndexChanged(int)),
             this, SLOT(handleEdgeChanged(int)));
+
+    connect(oneShotCheck, SIGNAL(stateChanged(int)),
+            this, SLOT(handleOneShotChanged(int)));
 
     connect(showCallsCheck, SIGNAL(stateChanged(int)),
             this, SLOT(handleShowCallsChanged(int)));
@@ -88,6 +91,12 @@ void TriggerOptionsDialog::handleEdgeChanged(int index) {
     QVariant data = edgeSelect->itemData(index);
     TriggerOptions::EdgeType edge = (TriggerOptions::EdgeType) data.toInt();
     currentOptions.edge = edge;
+    emit optionsChanged(currentOptions);
+}
+
+void TriggerOptionsDialog::handleOneShotChanged(int state) {
+    bool showShot = (bool) state;
+    currentOptions.oneShot = showShot;
     emit optionsChanged(currentOptions);
 }
 

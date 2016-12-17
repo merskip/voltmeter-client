@@ -11,6 +11,8 @@ struct TriggerOptions {
         FallingEdge,
         RisingEdge
     } edge;
+
+    bool oneShot;
 };
 
 const TriggerOptions DEFAULT_TRIGGER_OPTIONS = {
@@ -18,5 +20,6 @@ const TriggerOptions DEFAULT_TRIGGER_OPTIONS = {
         .isShowCalls = true,
         .channel = 1,
         .voltage = 2.7,
-        .edge = TriggerOptions::FallingEdge
+        .edge = TriggerOptions::FallingEdge,
+        .oneShot = false
 };;

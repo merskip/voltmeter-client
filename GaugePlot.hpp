@@ -84,4 +84,5 @@ private:
 
 signals:
     void isDone();
+    void oneShotActive();
 };
