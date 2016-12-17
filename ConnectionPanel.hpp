@@ -13,7 +13,7 @@
 #define DEFAULT_NETWORK_PORT 22444
 
 #define DEFAULT_SERIAL_PORT_NAME "ttyACM0"
-#define DEFAULT_SERIAL_BAUD_RATE 9600
+#define DEFAULT_SERIAL_BAUD_RATE 115200
 
 class ConnectionPanel : public QWidget {
     Q_OBJECT
