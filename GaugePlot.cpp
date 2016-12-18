@@ -1,5 +1,4 @@
 #include "GaugePlot.hpp"
-#include "FrameShiftTrigger.hpp"
 
 GaugePlot::GaugePlot() : QCustomPlot() {
 
@@ -112,26 +111,31 @@ void GaugePlot::showFrame(Connection::Frame &data) {
     xAxis->setRange(0, dataSize);
 
     if (triggerOptions.isActive) {
-        applyTrigger(data);
+        bool calledTrigger = applyTrigger(data);
         updateTriggerLinesPosition();
+
+        if (calledTrigger && triggerOptions.oneShot)
+            emit oneShotActive();
     }
 
     replot();
     emit isDone();
 }
 
-void GaugePlot::applyTrigger(Connection::Frame &data) {
+bool GaugePlot::applyTrigger(Connection::Frame &data) {
     ShiftFrameTrigger frameTrigger(triggerOptions, data);
-    moveGraphForTrigger(frameTrigger);
+    bool calledTrigger = moveGraphForTrigger(frameTrigger);
     if (triggerOptions.isShowCalls)
         updateTriggersPoints(frameTrigger);
 
     updateFrequency(frameTrigger);
+    return calledTrigger;
 }
 
-void GaugePlot::moveGraphForTrigger(ShiftFrameTrigger &frameTrigger) {
+bool GaugePlot::moveGraphForTrigger(ShiftFrameTrigger &frameTrigger) {
     double graphShift = frameTrigger.getShift();
     moveGraph(graphShift);
+    return graphShift != 0.0;
 }
 
 void GaugePlot::moveGraph(double shift) {

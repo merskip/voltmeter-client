@@ -33,6 +33,7 @@ QLayout *TriggerOptionsDialog::createLayoutUI() {
     edgeSelect->addItem("Opadające", TriggerOptions::FallingEdge);
 
     oneShotCheck = new QCheckBox("OneShot");
+    oneShotCheck->setChecked(false);
     showCallsCheck = new QCheckBox("Pokaż wywołania");
 
     formLayout = new QFormLayout();
@@ -40,6 +41,8 @@ QLayout *TriggerOptionsDialog::createLayoutUI() {
     formLayout->addRow("Kanał: ", channelSelect);
     formLayout->addRow("Napięcie: ", voltageEdit);
     formLayout->addRow("Zbocze: ", edgeSelect);
+    formLayout->addRow("", showCallsCheck);
+    formLayout->addRow("", oneShotCheck);
     return formLayout;
 }
 

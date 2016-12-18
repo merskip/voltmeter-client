@@ -69,8 +69,8 @@ private:
 
     void updateGraphChannel(int channel, double time, double voltage);
 
-    void applyTrigger(Connection::Frame &data);
-    void moveGraphForTrigger(ShiftFrameTrigger &frameTrigger);
+    bool applyTrigger(Connection::Frame &data);
+    bool moveGraphForTrigger(ShiftFrameTrigger &frameTrigger);
     void moveGraph(double shift);
 
     void updateTriggersPoints(FrameTrigger &frameTrigger);

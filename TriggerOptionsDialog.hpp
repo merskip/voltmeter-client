@@ -18,6 +18,7 @@ private:
     QComboBox *channelSelect;
     QDoubleSpinBox *voltageEdit;
     QComboBox *edgeSelect;
+    QCheckBox *showCallsCheck;
     QCheckBox *oneShotCheck;
 
     QFormLayout *formLayout;
