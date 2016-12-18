@@ -1,4 +1,4 @@
-# Voltmerter
+# Voltmeter
 
 ## Instalacja
 
