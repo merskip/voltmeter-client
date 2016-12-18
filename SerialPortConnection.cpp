@@ -58,7 +58,7 @@ Measurement SerialPortConnection::downloadOne() {
     serial->waitForBytesWritten(1000);
     QByteArray message = readOneLine();
 
-    QList<QByteArray> dataList = message.split(' ');
+    QList<QByteArray> dataList = message.trimmed().split(' ');
     if (dataList.size() < 5) {
         std::cerr << "error: unexception message: " << message.toStdString() << std::endl;
         return {};
